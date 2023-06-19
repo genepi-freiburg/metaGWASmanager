@@ -15,6 +15,9 @@ if (mode != "pheno" && mode != "jobs") {
 # read, check and dump parameter file
 #############################################################################
 
+# TODO do we need to take care of paths?
+source("consortium-specifics.R")
+
 parameters = read.table(file = arguments[1], 
                         header = F, 
                         col.names = c("key", "value"),
@@ -44,26 +47,22 @@ get_parameter_with_default = function(key, defaultValue) {
   return(parameters$value[idx])
 }
 
-required_parameters = c(
+standard_required_parameters = c(
   "input_file",
   "pc_count",
   "study_name",
   "ancestry",
   "refpanel",
   "analysis_date",
-  "correct_jaffe",
-  "creatinine_serum_unit",
-  "creatinine_urine_unit",
-  "cystatin_serum_unit",
-  "urate_unit",
-  "calcium_unit",
-  "albumin_serum_unit",
-  "albumin_urine_unit",
-  "phosphate_unit",
-  "lod_urinary_albumin",
   "additional_covariables",
   "additional_categorical_covariables"
 )
+
+required_parameters = c(
+  standard_required_parameters,
+  get_required_parameters()
+)
+
 
 parameters_list = list()
 for (parameter in required_parameters) {
