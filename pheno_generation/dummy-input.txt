@@ -1,0 +1,2 @@
+IID	FID	sex	age_baseline	PC1	PC2	PC3	PC4	PC5	PC6	PC7	PC8	PC9	PC10	crea_serum	albumin_serum	cystc_serum	crea_urine	phosphate_serum	albumin_urine	gout	calcium_serum	urate_serum	age_screa	age_scys	age_salb	age_spho	age_scal	age_suac	age_urine	age_gout
+xyz	abc	M	64	0.0032	0.0045	0.0229	0.0121	-0.0047	-0.0135	-0.016	-0.0089	0.0272	-0.0074	1.24	39.09	1.298	72.639999	1.12	14.01	0	2.2	8.94	64	64	64	64	64	64	64	64

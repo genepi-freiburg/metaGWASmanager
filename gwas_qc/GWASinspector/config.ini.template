@@ -1,0 +1,236 @@
+###
+# 			Config file for GWASinspector package
+# Please do not change section titles or variable names.
+# Variables can be uncommented by deleting the semicolon at the beginning of the line.
+# Default values will be used for commented variables.
+###
+
+[paths]
+
+# Specifies the name of the files to be QC’ed
+# This is a regular expression template and will be checked against all files in the dir_data folder.
+# Accepted file formats are: *.txt, *.csv, *.dat, gziped files (*.gz)
+# Zipped files (*.zip) are accepted but not recommended.
+
+# e.g. this pattern will match all file names that start with 'study' and end with 'txt'.
+# filename = ^study.+txt$
+# e.g. this pattern will match all file names that end with txt.
+# filename = .+txt$
+
+filename = .+gwas\.gz$
+
+# CKD_RegenieStep2/chr10_egfr_creat_inker_2021_int.regenie
+
+# Prefix for output file and plot namess. default value is 'QC'.
+filename_output_tag = QC
+
+
+# Folder containing the input file(s) (do not use a trailing slash)
+dir_data = /storage/cleaning/ckdgenR5/STUDY_NAME/data
+
+# Folder where the output will be placed. default value is 'dir_data' folder (do not use a trailing slash)
+dir_output = /storage/cleaning/ckdgenR5/STUDY_NAME/qc-output
+
+# Folder containing reference and header files. default value is 'dir_data' folder (do not use a trailing slash)
+dir_references = /storage/databases
+
+
+
+[supplementaryFiles]
+
+# Translation table for the column-names of the input file(s)
+# This file should be put in the 'dir_references' folder
+header_translations = alt_headers.txt
+
+# Path to allele reference file.
+# This could be a SQLite, RData, RDS or tab delimited text file with the correct format.
+# Refer to the manual for further detail on file format.
+# This file should be put in the 'dir_references' folder
+#allele_ref_std = HapMap_CEU_r28_b36_EDIT_v10c.RData
+allele_ref_std = dbSNP_human_9606_b151_GRCh38p7.sqlite
+#allele_ref_std = dbSNP_human_9606_b151_GRCh37p13.sqlite
+
+# Specify which sub population to select for allele frequency selection, default value = EUR
+# In the standard references, the following options are available:
+# for HapMap sqlite file use CEU
+# for 1000G sqlite file use one of: EAS , AMR , AFR , EUR , SAS
+allele_ref_std_population = COMMON
+
+# [Optional] path to alternative reference file.
+# This could be a RData, RDS or tab-delimited text file with the correct format. gzip files (*.gz) are accepted.
+# This file should be put in the 'dir_references' folder
+# Refer to the manual for further detail on file format.
+# GWASinspector will create a new file if the named file cannot be found
+# NOTE: this file will be updated and over-written at the end of the QC
+;allele_ref_alt = alt_ref.txt
+
+
+# [Optional] path to Beta (Effect) reference file
+# This could be a RData, RDS or tab delimited text file with the correct format. gzip files (*.gz) are accepted.
+# This file should be put in the 'dir_references' folder
+# Refer to the manual for further detail on file format
+;beta_ref_std = effects.txt
+
+
+[input_parameters]
+### This section defines how the input file(s) are loaded.
+
+# If any character other than ["\t" , SPACE] are used, un-comment this line and type the character inside quotation marks; e.g. "|" or  ","
+;column_separator = ","
+
+
+# Character-vector containing the strings that indicate 'missing' values in the dataset.
+# Default values are : ["NA", "nan", "NaN", "."]
+# Un-comment and fill the next line if any character other than above values are used for NA.
+; na.string = "none"
+
+# Character-vector containing the strings that indicate TRUE/FALSE in Imputation Status column.
+# Default values for imputed variants are = c("TRUE", "T", "YES", "Y")
+# Default values for non-imputed variants are = c("FALSE", "F", "NO", "N")
+
+# EXAMPLES:
+# imputed_T = "IMPUTED"
+# imputed_F = "GENOTYPED"
+# OR
+# imputed_T = c("1","2","3","4")
+# imputed_F = c("0","-9")
+
+# Un-comment and fill the next lines if any character other than above values are used (in UPPERCASE format).
+;imputed_T = ""
+;imputed_F = ""
+
+
+# Effect column: this parameter specifies whether effect size is Odds ratio (OR) or Beta (BETA)
+effect_type = BETA
+
+# Set file order for checking
+# The following strings can be used to select which files should be analyzed first.
+# This is particularly useful for selecting the files with the most number of variants at first
+# and will improve the variant searching process.
+; file_order_string = c('pooled','all')
+
+[output_parameters]
+### This section defines how the output file is saved
+
+# Should the post-QC dataset be saved? Default = TRUE
+save_final_dataset = FALSE
+
+
+# Should the post-QC dataset be compressed? Default = FALSE
+gzip_final_dataset = FALSE
+
+# Generates an effect-size reference dataset from the input file. Default = FALSE
+# Refer to the manual for further detail.
+save_as_effectSize_reference = FALSE
+
+# A translation table for the column-names of the output file. available standard formats are:
+# "standard" ,  "GCTA" , “GWAMA”, “PLINK”, “GenABEL” and “META”.
+# “standard” (default setting) retains the column names used by this package
+# NOTE: do not put the value inside quotation marks.
+out_header = standard
+
+# Character-strings of the column-separator, default = tab("\t")
+# Allowed variables are  '\t' , ';' , '|' , ','
+# NOTE: do not put the value inside quotation marks.
+out_sep = \t
+
+# Character-string to use for missing values,default = NA
+# Allowed variables are  'NA' , '.' , 'NaN' , 'nan'
+# NOTE: do not put the value inside quotation marks.
+out_na = NA
+
+# Character string to use for decimal points. Must be a single character. default = "."
+# NOTE: do not put the value inside quotation marks.
+out_dec = .
+
+# Save final report as HTML
+# This requires Pandoc and rmarkdown package.
+html_report = TRUE
+
+# Save R object file
+# This file includes all reported items as an R object and can be used
+# For further file comparisons without running the whole algorithm again.
+object_file = TRUE
+
+# Marking multi-allelic variants in the cleaned result file.
+# This will be detected according to the standard reference dataset.
+# A new column is added ("MULTI_ALLELIC") which contains either 0/1 or NA (if variant was not found in the standard reference).
+add_column_multiallelic = FALSE
+
+# Marking variants with a high allele frequency difference compared to the standard reference dataset.
+# "threshold_diffEAF" value is used as the difference threshold.
+# A new column is added ("highDiffEAF") which contains either 0/1 or NA (if variant was not found in the standard reference).
+add_column_AFmismatch = FALSE
+
+# Marking high quality variants.
+# "HQfilter_FRQ","HQfilter_HWE","HQfilter_cal","HQfilter_imp" values are used as the threshold.
+# Refer to the manual for further detail.
+# A new column is added ("HQ") which contains either 0/1.
+add_column_HQ = FALSE
+
+# Adding RSID values to the result file.
+# This will be detected according to the standard reference dataset.
+# A new column is added ("REF_RSID") which contains RSIDs.
+add_column_rsid = FALSE
+
+# Adding reference allele frequency values to the result file.
+# This will be done using the standard reference dataset.
+# A new column is added ("AF").
+add_column_AF = FALSE
+
+# Adding harmonized ID values to the result file.
+# RSID might not be available for all variants. This unique id can be used instead.
+# hID is built after matching the variants with standard reference dataset.
+# So, variant alleles and order might be changed compared to before checking the file in GWASinspector.
+# The combination of CHR:POS:REF_ALL:ALT_ALL will be used.
+# A new column is added ("hID").
+add_column_hid = TRUE
+
+
+# Order variants on chromosome:position combination.
+ordered = FALSE
+
+[remove_chromosomes]
+# Whether X-chromosome, Y-chromosome, pseudo-autosomal and mitochondrial SNPs are removed. Default value is FALSE
+remove_X = FALSE
+remove_Y = FALSE
+remove_XY = FALSE
+remove_M = FALSE
+
+[plot_specs]
+# Should the various QC steps create plots?
+make_plots = TRUE
+
+
+# File format for saving plot files
+# Available options are 'png' , 'jpeg' , 'tiff'; Default value is 'png'.
+# Note: 'tiff' format files are much larger and slower to save and they WILL NOT appear in the HTML report file.
+graphic_device = png
+
+
+# Title to display at the top of plots - does not work if multiple files are tested
+# Name of the input result file is used by default.
+;plot_title = my study
+
+# Threshold for excluding low-significance SNPs from the QQ & Manhattan plots.
+# Reducing the number of points to be plotted will significantly reduce the running time.
+# default value = 0.01
+plot_cutoff_p = 0.01
+
+[filters]
+# Threshold values for the high-quality (HQ) variant selection
+# Variants that do not meet or exceed all four of those values will be excluded from several QC tests.
+#The filters are for allele-frequency (HQfilter_FRQ), HWE p-value (HQfilter_HWE), callrate (HQfilter_cal) & imputation quality (HQfilter_imp) respectively.
+HQfilter_FRQ = 0.01
+HQfilter_HWE = 1e-6
+HQfilter_cal = 0.95
+HQfilter_imp = 0.3
+
+# The threshold for the difference between reported and reference allele-frequency values.
+# SNPs for which the difference exceeds the threshold are counted and reported. default value = 0.15
+threshold_diffEAF = 0.15
+
+# The minimum and maximum possible imputation quality values. Default value = -0.5 and 1.5 respectively.
+# Values out of this range are converted to NA.
+minimal_impQ_value = -0.5
+maximal_impQ_value = 1.5
