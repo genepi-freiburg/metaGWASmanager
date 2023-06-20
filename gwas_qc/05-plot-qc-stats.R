@@ -5,7 +5,8 @@ data = read.csv("/storage/cleaning/ckdgenR5/00_SUMMARY/qc-stats.csv")
 
 for (pheno in unique(data$PHENO)) {
   print(pheno)
-  pdf(paste0("/storage/cleaning/ckdgenR5/00_SUMMARY/plots/Assoc-QC-", pheno, "-plots.pdf"))
+  my_width <- sum(data$PHENO == pheno,na.rm=TRUE)/1.5 # fine tune factor
+  pdf(paste0("/storage/cleaning/ckdgenR5/00_SUMMARY/plots/Assoc-QC-", pheno, "-plots.pdf"),width=my_width)
   pheno_data = data[data$PHENO == pheno,]
   
   for (var in c("PVALUE", "BETA", "STDERR", "IMP_QUALITY", "EFF_ALL_FREQ")) {
