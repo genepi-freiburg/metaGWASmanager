@@ -364,5 +364,4 @@ determine_phenotypes_covariables <- function(parameters_list) {
   return(data_frame)
     
 }
-  
-}
+ 
