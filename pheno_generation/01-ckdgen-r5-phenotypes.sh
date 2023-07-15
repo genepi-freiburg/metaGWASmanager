@@ -1,4 +1,6 @@
 #!/bin/bash
+module load R/4.1.0-foss-2021a
+
 
 if [ "$1" == "" ]
 then
@@ -8,5 +10,4 @@ fi
 
 chmod 0755 *.jobs
 mkdir -p return_pheno output_pheno regenie_temp logs
-Rscript ckdgen-r5.R $1 pheno | tee return_pheno/pheno_script_output.log
-
+Rscript consortium.R $1 pheno | tee return_pheno/pheno_script_output.log

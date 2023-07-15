@@ -1,4 +1,5 @@
 #!/bin/bash
+module load R/4.1.0-foss-2021a
 
 if [ "$1" == "" ]
 then
@@ -7,7 +8,7 @@ then
 fi
 
 mkdir -p regenie_temp logs output_regenie_step1 output_regenie_step2 jobs
-Rscript ckdgen-r5.R $1 jobs | tee return_pheno/jobs_script_output_1.log
+Rscript consortium.R $1 jobs | tee return_pheno/jobs_script_output_1.log
 
 echo "Generate job scripts"
 chmod 0755 ./output_pheno/*.sh

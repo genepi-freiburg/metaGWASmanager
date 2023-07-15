@@ -1,13 +1,21 @@
-# adjust this file to fit your consortium
+# Adjust this file to fit your consortium
+
+#FUNCTION 0 ---- NAME OF THE CONSORTIUM
+#Add the name of your consortium
+get_consortium_name <- function() {
+  c("MetalGWAS")
+}
 
 
+##############################################
+###              Mode =  "Pheno"           ##
+##############################################
 # FUNCTION 1 --- PARAMETERS FILE
 # this function should return the names of the parameters
 # your end user give in their parameters files;
 # don't name the following parameters, but they are required as well
 # "input_file", "pc_count", "study_name", "ancestry", "refpanel",
 # "analysis_date", "additional_covariables", "additional_categorical_covariables"
-
 get_required_parameters<- function (parameters) {
   # TODO move this to example file and make this vector empty
   required_parameters<- c( "cadmium_urine_unit",  "selenium_urine_unit", "arsenic_urine_unit", "cadmium_plasma_unit",  "selenium_plasma_unit","arsenic_plasma_unit", 
@@ -31,7 +39,7 @@ get_required_parameters<- function (parameters) {
 # (get "parameters" list as an argument, thus can use 
 # parameters to make a column optional/required)
 
-#A. Required columns function
+#FUNCTION 2. Required columns function
 get_required_columns<- function (parameters_list) {
   #don't name "FID", "IID", "sex". They're in the parent script
   required_columns<-c()
@@ -42,18 +50,18 @@ get_required_columns<- function (parameters_list) {
   
   if (parameters_list$blood_metals_available=="yes") {
     required_columns <- c(required_columns,   
-                          "age_bloodmetal", "smoking_bloodmetal", "egfr_bloodmetal", "bmi_bloodmetal")
+                          "age_bloodmetal", "smoking_bloodmetal", "bmi_bloodmetal")
   }
   
   if (parameters_list$plasma_metals_available=="yes") {
     required_columns <- c(required_columns,   
-                          "age_plasmametal", "smoking_plasmametal", "egfr_plasmametal","bmi_plasmametal")
+                          "age_plasmametal", "smoking_plasmametal","bmi_plasmametal")
   }
   
 }
 
 
-#B. optional columns function
+#FUNCTION 3. optional columns function
 get_optional_columns<- function () {
   urine_metals<- c ("cadmium_urine", "selenium_urine", "arsenic_urine")
   blood_metals <- c ()
@@ -63,8 +71,6 @@ get_optional_columns<- function () {
 }
 
 
-
-
 # FUNCTION 4 --- UNIT CONVERSIONS
 # unit conversions:
 # function gets the whole input data set
@@ -72,26 +78,27 @@ get_optional_columns<- function () {
 # which unit conversions are necessary
 # needs to check for wrong parameters/unit
 # returns the normalized data set
-
 perform_unit_normalization <- function (input, parameters_list) {
-  #metals variable  
+  #A. Unit normalization for metals variables: 
+  #Get vector to perform unit normalization
   optional.variables <- optional_columns[optional_columns %in% names(input)]
   for(variable in optional.variables){
-    # -1 = "not provided unit"; 0 = ug/l; 1 =ug/dl
+    # Values define in parameters file:  -1 = "not provided unit"; 0 = ug/l; 1 =ug/dl
     unit.name = paste0(variable, "_unit")
+    #Check if the units are given in the parameter file.
     if (length(!is.na(input[, variable])) > 0 & parameters_list[unit.name] == -1) {
       stop(paste0( variable, " in input file, but units not given in parameter file."))
     } 
-    
+    #Perform unit conversion
     if (length(!is.na(input[, variable])) > 0 & parameters_list[unit.name] == 1) {
       input[, variable] <- input[, variable]*10  #conversion from ug/dl to ug/l
     }
   }
   
-  #other variables
+  #B. Unit normalization for other variables (same structure as above)
   other.variables<- c ("creatinine_urine")
   for (variable in other.variables) {
-    #0 = g/l, 1 = mg/dl, give -1 if you do not have
+    #Values define in parameters file: 0 = g/l, 1 = mg/dl, give -1 if you do not have
     unit.name = paste0(variable, "_unit")
     if (length(!is.na(input[, variable])) > 0 & parameters_list[unit.name] == -1) {
       stop(paste0( variable, " in input file, but units not given in parameter file."))
@@ -106,14 +113,12 @@ perform_unit_normalization <- function (input, parameters_list) {
 
 
 # FUNCTION 5 --- CHECK QUANTITATIVE INPUT COLUMNS
-
 # check quantitative trait summaries
 # needs to return a data frame with the
 # columns: trait variable name, absolute_min, absolute_max,
 #  median_min, median_max 
-
-#Function 5A. Get a vector with the quantitative  variables
-get_quantitative_variables <- function() {
+get_quantitative_trait_check_params <- function(input) {
+  #Define the quantitative vectors
   quant_vec1 <- c("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
   quant_vec2 <- c("creatinine_urine")
   quant_vec3 <- c("age_urinemetal", "age_plasmametal")
@@ -121,68 +126,62 @@ get_quantitative_variables <- function() {
   quant_vec5<- c("bmi_urinemetal", "bmi_plasmametal")
   quant_vec6<- c("seafood_intake")
   
-  c(quant_vec1, quant_vec2, quant_vec3, quant_vec4, quant_vec5, quant_vec6)
-}
- 
- 
-#Function 5b. Get a db with the reference parameter of the quantitative  variables
-get_quantitative_trait_check_params <- function(variable, input) {
-  #Define vectors
-  quant_vec1 <- c("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
-  quant_vec2 <- c("creatinine_urine")
-  quant_vec3 <- c("age_urinemetal", "age_plasmametal")
-  quant_vec4<- c("egfr_urinemetal", "egfr_plasmametal")
-  quant_vec5<- c("bmi_urinemetal", "bmi_plasmametal")
-  quant_vec6<- c("seafood_intake")
+  #Merge quantitative vectors into a single one
+  quantitative_variables <- c(quant_vec1, quant_vec2, quant_vec3, quant_vec4, quant_vec5, quant_vec6)
   
-  #parameters creation
+  #Create the required parameters for the quantitative variables
   absolute_min <- NA
   absolute_max <- NA
   median_min <- NA
   median_max <- NA
   
-  # Check type of variable
-  if (variable %in% quant_vec1) {
-    mean <- mean(input[ , variable], na.rm = T)
-    sd <- sd(input[ , variable], na.rm = T)
-    absolute_min <- 0
-    absolute_max <- mean+3*sd
-    median_min <- 0
-    median_max <- mean+3*sd
-  } else if (variable %in% quant_vec2) {
-    absolute_min <- 0
-    absolute_max <- 100000 
-    median_min <- 0
-    median_max <- 2000
-  }  else if (variable %in% quant_vec3) {
-    absolute_min <- 0
-    absolute_max <- 200 
-    median_min <- 1
-    median_max <- 100
-  }  else if (variable %in% quant_vec4) {  
-    absolute_min <- 0
-    absolute_max <- 160 
-    median_min <- 60
-    median_max <- 120
-  }  else if (variable %in% quant_vec5) {
-    absolute_min <- 12
-    absolute_max <- 50 
-    median_min <- 18
-    median_max <- 30
-  } else if (variable %in% quant_vec6) {
-    absolute_min <- 0
-    absolute_max <- 5000 
-    median_min <- 10
-    median_max <- 120
-  } 
-
-  # df creation
-  quantitative_param <- data.frame(variable = variable,
-                          absolute_min = absolute_min,
-                          absolute_max = absolute_max,
-                          median_min = median_min,
-                          median_max = median_max)
-  return(quantitative_param)
+  #Create empty table
+  table <-  as.numeric()
+  
+  # Check type of variable and assign a value per required parameters
+  for (variable in quantitative_variables) {
+    if (variable %in% quant_vec1) {
+      mean <- mean(input[ , variable], na.rm = T)
+      sd <- sd(input[ , variable], na.rm = T)
+      absolute_min <- 0
+      absolute_max <- mean+1000*sd  #Ask Maria 
+      median_min <- 0
+      median_max <- mean+1000*sd  ##Ask Maria 
+    } else if (variable %in% quant_vec2) {
+      absolute_min <- 0
+      absolute_max <- 100000 
+      median_min <- 0
+      median_max <- 2000
+    }  else if (variable %in% quant_vec3) {
+      absolute_min <- 0
+      absolute_max <- 200 
+      median_min <- 1
+      median_max <- 100
+    }  else if (variable %in% quant_vec4) {  
+      absolute_min <- 0
+      absolute_max <- 160 
+      median_min <- 60
+      median_max <- 120
+    }  else if (variable %in% quant_vec5) {
+      absolute_min <- 12
+      absolute_max <- 50 
+      median_min <- 18
+      median_max <- 30
+    } else if (variable %in% quant_vec6) {
+      absolute_min <- 0
+      absolute_max <- 5000 
+      median_min <- 10
+      median_max <- 120
+    } 
+    #Name of the tested variable
+    variable<- variable
+    
+    # Complete table
+    result <- c(variable, absolute_min, absolute_max, median_min, median_max)
+    table <- rbind(table, result)
+  }
+  colnames(table)<- c("variable", "absolute_min", "absolute_max", "median_min", "median_max")
+  return(table)
 }
   
  
@@ -190,67 +189,92 @@ get_quantitative_trait_check_params <- function(variable, input) {
 
 
 # FUNCTION 7 ---- CHECK CATEGORICAL INPUT COLUMNS
-#Function 7A. Get a vector with the categorical  variables
-get_categorical_variables <- function() {
-  c("sex", "smoking_urinemetal", "smoking_bloodmetal", "smoking_plasmametal")
-}
-
-
-#Function 7b. Get a db with the reference parameter of the categorical  variables
-get_categorical_trait_check_params <- function(variable) {
-  #Define vectors categories
+# check categorical trait summaries
+# needs to return a data frame with the
+# types of categories
+get_categorical_trait_check_params <- function() {
+  #Define categorical vectors
   cat_vec1 <- c("sex")
   cat_vec2 <- c("smoking_urinemetal", "smoking_bloodmetal", "smoking_plasmametal")
-
-  categories <- c()
-  # Check type of variable
-  if (variable %in% cat_vec1) {
-    categories <- c("M", "F")
-  } else if (variable %in% cat_vec2) {
-    categories <- c("N", "F", "C")
-  } 
   
-  # df creation
-  categorical_param <- data.frame(variable = variable,
-                                  categories = paste(categories, collapse = ", "))
-  return(categorical_param)
-}
-
-
-# FUNCTION 8 --- IMPUTE VALUES BELOW LOD   [LOD/sqrt(2)]
-# 8A. Get vector with the name of variables to impute
-get_variables_to_impute <- function() {
-  c("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
-}
-
-# 8B. Create the inputation function
-imputation<- function(var.to.impute, parameters_list, result) {
-  for(variable in var.to.impute){
-    lod.name <- paste0(variable, "_lod")
-    lod <- as.numeric(parameters_list[lod.name])
-    result[, variable] <- ifelse(result[, variable] < lod, lod/sqrt(2), result[, variable])
+  #Merge categorical vectors into a single one
+  categorical_variables<- c(cat_vec1, cat_vec2)
+  
+  #Create the required categories for the categorical variables
+  categories <- c()
+  
+  #Create empty table
+  table<- as.character()
+  
+  # Check type of variable and assign categories
+  for (variable in categorical_variables) {
+    if (variable %in% cat_vec1) {
+      categories <- c("M", "F")
+    } else if (variable %in% cat_vec2) {
+      categories <- c("N", "F", "C")
+    } 
+    variable<- variable
+    categories <- paste(categories, collapse = ", ")
+    
+    # Complete table
+    result<- c (variable, categories)
+    table <- rbind(table, result)
   }
-  return(result)
+  colnames(table)<- c("variable", "categories")
+  return(table)
 }
 
 
-# FUNCTION 9 --- CALCULATE DERIVED PHENOTYPES BASED ON INPUT
+# FUNCTION 8 --- CALCULATE DERIVED PHENOTYPES BASED ON INPUT
 # including INT, etc.
 # including sex stratification (or other stratifications)
-
-calculate_derived_phenotypes <- function(result) {
-  #vectors
+calculate_derived_phenotypes <- function(result, parameters_list) {
+  ###Define type of vectors###
+  #Vector with variables to impute 
+  vars.to.impute<- c ("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
+  
+  #Vector with variables to correct by creatinine
+  vars.to.creat.correct<- c("cadmium_urine", "selenium_urine", "arsenic_urine")
+  
+  #Vector with variables to perform log2-transformation
   log2_phenos<- c ("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
+  
+  #Vector with variables to perform the inverse normal transformation
   int_phenos<- c ()
+  
+  #Vector with variables to perform the sex stratification
   vars.to.sex.strat<- c ("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
+  
+  #Vector with variables to perform the smoking stratification
   var.smoke.strat <- c ("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
   
+  #1. Imputation [LOD/sqrt(2)] metals values <LOD LOD/sqrt(2)
+    for(colname in colnames(result)){
+      if (colname %in% vars.to.impute) {
+        lod.var <- paste0(colname, "_lod")
+        lod <- as.numeric(parameters_list[lod.var])
+        result[, colname] <- ifelse(result[, colname] < lod, lod/sqrt(2), result[, colname])
+      }
+    }
+ 
+  #2. Urine metals needed to be divided by creatinine
+  for(colname in colnames(result)){
+    if (colname %in% vars.to.creat.correct) {
+      result[, colname] <- result[, colname]/result[, "creatinine_urine"]
+    }
+  }
+  
+  #3. Values transformation: log / INT
   for (colname in colnames(result)) {
     #log2 transformation
     if (colname %in% log2_phenos) {
-      #Check if there are 0s ¡be careful wit Nas
+      #Check if there are 0 values. They are a problem in logtransformation
+      if (any(result[, colname] == 0, na.rm = TRUE)) {
+      print(paste0("Zero values in variable:", colname, ". Need to sum 0.00001 to avoid problems in logtransformation"))
+      }
       result[, colname] <- ifelse(result[, colname] == 0, result[, colname] + 0.00001, result[, colname])
-      #apply transformation
+      
+      #Apply logtransformation
       result[, colname] <- log2(result[, colname])
     }
     
@@ -260,7 +284,7 @@ calculate_derived_phenotypes <- function(result) {
     }
     
     
-    #Sex stratification
+    #4. Perform sex stratification
     if (colname %in% vars.to.sex.strat){
       col.male <- paste0(colname, "_male")
       col.female <- paste0(colname, "_female")
@@ -268,7 +292,7 @@ calculate_derived_phenotypes <- function(result) {
       result[, col.female] <- ifelse(result$sex == "F", result[, colname], NA)
     }
     
-    #Smoking status stratification (Never smoker)
+    #5. Perform smoking status stratification (Never smoker)
     if (colname %in% var.smoke.strat){
       col.neversmk <- paste0(colname, "_neversmk")
       result[, col.neversmk] <- ifelse(result$smoking_urinemetal == "N", result[, colname], NA)
@@ -278,34 +302,38 @@ calculate_derived_phenotypes <- function(result) {
 }
 
 
-# FUNCTIONS 10 --- PERFORM SPECIALIZED QC
+# FUNCTIONS 9 --- PERFORM SPECIALIZED QC
 # works on all data, including normalized / derived phenotpes
 
-#Function 10.a. vector with unrelevant variable
-get_unrelevant_cols<- function () {
- c("sex_0_female_1_male") 
+#Function 9.a. Get categorical variables
+get_categorical_variables <- function() {
+  c("sex", "smoking_urinemetal", "smoking_bloodmetal", "smoking_plasmametal")
 }
 
-#Function 10.b. vector with binary variable
+#Function 9.b. Get binary variables
 get_binary_cols<- function() {
   c("sex")
 }
 
-#Function 10.c. vector with number of minmum cases to study the variable
+#Function 9.c. Get  number of minimum cases to study the variable
 get_number_cases<- function() {
   c(500)
 }
 
-#Function 10.d. vector with categorical variables
+#Function 9.d. vector with categorical variables
 get_cat_cols<- function() {
   c("smoking_urinemetal", "smoking_plasmametal")
 }
 
-#Function 10.e. Create a vector with the age_variable (names of this vector are the specific variables)
+#Function 9.e. Create a vector with the age_variable (names of this vector are the specific variables)
 get_age_for_phenotype<- function() {
-  urine_metals<- c ("cadmium_urine", "selenium_urine", "arsenic_urine")
+  urine_metals<- c ("cadmium_urine", "cadmium_urine_female", "cadmium_urine_male", "cadmium_urine_neversmk",
+                      "selenium_urine", "selenium_urine_female", "selenium_urine_male", "selenium_urine_neversmk",
+                      "arsenic_urine", "arsenic_urine_female", "arsenic_urine_male", "arsenic_urine_neversmk")
   blood_metals <- c ()
-  plasma_metals<- c ("cadmium_plasma", "selenium_plasma", "arsenic_plasma")
+  plasma_metals<- c("cadmium_plasma", "cadmium_plasma_female", "cadmium_plasma_male", "cadmium_plasma_neversmk",
+                      "selenium_plasma", "selenium_plasma_female", "selenium_plasma_male", "selenium_plasma_neversmk",
+                      "arsenic_plasma", "arsenic_plasma_female", "arsenic_plasma_male", "arsenic_plasma_neversmk" )
   all_metals <- c(urine_metals, blood_metals, plasma_metals)
   
   age_vector <- rep(c("age_urinemetal", "age_bloodmetal", "age_plasmametal"), times = c(length(urine_metals), length(blood_metals), length(plasma_metals)))
@@ -315,14 +343,11 @@ get_age_for_phenotype<- function() {
 }
   
 
-# FUNCTION 11 --- PERFORM ADDITIONAL / SPECIALIZED PLOTS
-# e.g., combining two phenotypes
+##############################################
+###             Mode =  "Jobs"             ##
+##############################################
 
-perform_additional_plots <- function(parameters, input) {
-}
-
-
-# FUNCTION 12 --- DETERMINE PHENOTYPES/COVARIABLES
+# FUNCTION 11 --- DETERMINE PHENOTYPES/COVARIABLES
 # returns a data.frame with the following columns
 # phenotype - name of the data to be used as a phenotype
 # covariables - comma-separated list of quantitative covariables to use in this analysis
@@ -332,37 +357,66 @@ perform_additional_plots <- function(parameters, input) {
 #phenotype          covariables   catCovariables
 #egfr_creat_female  age,PC{1:40}  studycenter
 #egfr_creat_int     age,PC{1:40}  sex,studycenter
-
-determine_phenotypes_covariables <- function(parameters_list) {
-  phenotype1<- c("cadmium_urine", "cadmium_urine_female", "cadmium_urine_male", 
-                "selenium_urine", "selenium_urine_female", "selenium_urine_male",
-                "arsenic_urine", "arsenic_urine_female", "arsenic_urine_male")
+determine_phenotypes_covariables <- function() {
+  #1.Define your quantitative phenotypes vectors:
+  quant_pheno1<- c("cadmium_urine", "cadmium_urine_female", "cadmium_urine_male", "cadmium_urine_neversmk",
+                   "selenium_urine", "selenium_urine_female", "selenium_urine_male", "selenium_urine_neversmk",
+                   "arsenic_urine", "arsenic_urine_female", "arsenic_urine_male", "arsenic_urine_neversmk")
   
-  phenotype2<- c("cadmium_plasma", "cadmium_plasma_female", "cadmium_plasma_male",
-                 "selenium_plasma", "selenium_plasma_female", "selenium_plasma_male",
-                 "arsenic_plasma", "arsenic_plasma_female", "arsenic_plasma_male")
+  quant_pheno2<- c("cadmium_plasma", "cadmium_plasma_female", "cadmium_plasma_male", "cadmium_plasma_neversmk",
+                   "selenium_plasma", "selenium_plasma_female", "selenium_plasma_male", "selenium_plasma_neversmk",
+                   "arsenic_plasma", "arsenic_plasma_female", "arsenic_plasma_male", "arsenic_plasma_neversmk" )
   
-  quant_covariables1<- c("age_urinemetal", "bmi_urinemetal", "egfr_urinemetal",
-                         paste0("PC", 1:parameters_list$pc_count))
+  #2. Define your binary phenotypes
+  binary_pheno1<-c()
+  binary_pheno2<-c()
   
-  quant_covariables2<- c("age_plasmametal", "bmi_plasmametal", "egfr_plasmametal",
-                         paste0("PC", 1:parameters_list$pc_count))
+  #3. Define covariates##
+  #3.A. Quantitative covariates:
+  quant_covar1<- c("age_urinemetal", "bmi_urinemetal", "egfr_urinemetal",
+                   paste0("PC", 1:parameters_list$pc_count))
   
-  cat_covariables1<- c("smoking_urinemetal")
+  quant_covar2<- c("age_plasmametal", "bmi_plasmametal", "egfr_plasmametal",
+                   paste0("PC", 1:parameters_list$pc_count))
   
-  cat_covariables2<- c("smoking_plasmametal")
+  #3.B. Categorical covariates:
+  cat_covar1<- c("sex", "smoking_urinemetal")
+  cat_covar2<- c("sex" ,"smoking_plasmametal")
   
-    data_frame <- data.frame(
-    phenotype <- c(phenotype1, phenotype2),
-    quant_covar <- c(rep(paste(quant_covariables1, collapse = ", "), length(phenotype1)), 
-                    rep(paste(quant_covariables2, collapse = ", "), length(phenotype2))),
-    cat_covar <- c(rep(paste(cat_covariables1, collapse = ", "), length(phenotype1)), 
-                  rep(paste(cat_covariables2, collapse = ", "), length(phenotype2)))
+  #3. Create a data frame
+  data_frame <- data.frame(
+    #Define strata. Three options here: overall, sex_stratified, Smk_stratified
+    strata =  ifelse(grepl("_male$", quant_pheno1) | grepl("_female$", quant_pheno1) |
+                       grepl("_male$", quant_pheno2) | grepl("_female$", quant_pheno2),
+                     "sex_stratified",
+                     ifelse(grepl("_neversmk$", quant_pheno1) | grepl("_neversmk$", quant_pheno2),
+                            "smk_stratified",
+                            "overall")),
+    #Define type of phenotype. In this example we only have quantitative outcomes.
+    type = c(rep("quantitative", length(quant_pheno1)), 
+             rep("quantitative", length(quant_pheno2)), 
+             rep("binary", length(binary_pheno1)), 
+             rep("binary", length(binary_pheno2))),
+    phenotype = c(quant_pheno1, quant_pheno2),
+    
+    #Define quantitative covariates. 
+    quant_covar = c(rep(paste(quant_covar1, collapse = ", "), length(quant_pheno1)), 
+                    rep(paste(quant_covar2, collapse = ", "), length(quant_pheno2))),
+    
+    #Define categorical covariates. 
+    cat_covar = c(rep(paste(cat_covar1, collapse = ", "), length(quant_pheno1)), 
+                  rep(paste(cat_covar2, collapse = ", "), length(quant_pheno2)))
   )
   
-  colnames(data_frame) <- c("Phenotypes", "Quant_covar", "Cat_covar")
+  colnames(data_frame) <- c("Strata" ,"Type" ,"Phenotypes", "Quant_covar", "Cat_covar")
+  
+   #Be careful with  stratification (omit sex and smk variable in sex_stratified and Smk_stratified, respectively)
+  data_frame$Cat_covar[data_frame$Strata == "sex_stratified"] <- gsub("sex,", "", data_frame$Cat_covar[data_frame$Strata == "sex_stratified"])
+  data_frame$Cat_covar[data_frame$Strata == "smk_stratified"] <- gsub(", smoking_urinemetal", "", data_frame$Cat_covar[data_frame$Strata == "smk_stratified"])
+  data_frame$Cat_covar[data_frame$Strata == "smk_stratified"] <- gsub(", smoking_plasmametal", "", data_frame$Cat_covar[data_frame$Strata == "smk_stratified"])
+  
   return(data_frame)
     
 }
   
-}
+
