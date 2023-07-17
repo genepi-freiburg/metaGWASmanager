@@ -418,5 +418,4 @@ determine_phenotypes_covariables <- function() {
   return(data_frame)
     
 }
-  
 
