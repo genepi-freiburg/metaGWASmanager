@@ -393,11 +393,11 @@ skewness <- function(x, na.rm = FALSE) {
 # QUANTITATIVE Summary statistics ----------------------------------
 print("Quantitative")
 
-#Vector with unrelevant columns for the summary statistics
-unrelevant_cols <- c("FID", "IID")
+#Vector with irrelevant columns for the summary statistics
+irrelevant_cols <- c("FID", "IID")
 #Get categorical variables.  Use "get_categorical_variables" function modified by the consortium core
 categorical_variables <- get_categorical_variables()
-quant_cols <- colnames(result)[!(colnames(result) %in% c(unrelevant_cols, categorical_variables, all_study_covar_cols))]
+quant_cols <- colnames(result)[!(colnames(result) %in% c(irrelevant_cols, categorical_variables, all_study_covar_cols))]
 
 #Use "get_binary_cols" function modified by the consortium core
 binary_cols <- c (get_binary_cols())
