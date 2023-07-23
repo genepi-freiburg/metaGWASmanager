@@ -33,3 +33,53 @@ $PLINK \
   --write-samples \
   --write-snplist
 
+
+
+
+
+# if your sample differs for the analyzed traits in the consortium you might want to run the snp filters per trait (e.g. to ensure that minor alleles of the filtered SNPs are present for the traits with high missinigness)
+# some of below code might be helpful for that
+
+# create id files for all traits
+R
+tmp <- read.table("myData.txt",header=TRUE)
+# traits <- c("age","bmi","egfr")
+for(trait in traits){
+index <- complete.cases(tmp[,trait])
+write.table(tmp[index,c("FAM_ID","id")],file=paste0(trait,"_IND.txt"),col.names=FALSE,row.names=FALSE,quote=FALSE)
+}
+q()
+
+
+for TRAIT in `ls *_IND.txt`
+do
+OUT=$(basename -s "_IND.txt" ${TRAIT})
+FILE=qc_pass_${OUT}.snplist
+if [ -f "$FILE" ]; then
+    echo "$FILE exists."
+else
+$PLINK \
+--bfile $PLINK_DATA_PREFIX \
+--keep $TRAIT \
+--geno 0.1 \
+--hwe 1e-15 \
+--mac 100 \
+--maf 0.01 \
+--mind 0.1 \
+--out qc_pass_${OUT} \
+--no-id-header \
+--write-snplist
+fi
+done
+
+R
+files <- list.files(pattern="*.snplist")
+snps <- read.table(files[1])[[1]]
+for(file in files[-1]){
+snps2 <- read.table(file)[[1]]
+snps <- intersect(snps,snps2)
+print(length(snps))
+}
+write.table(file="../qc_pass_strict.snplist",snps,row.names=FALSE,col.names=FALSE,quote=FALSE)
+
+# check if qc_pass_strict.snplist (overlap of the per trait snplists) still includes enough snps. If so run Regenie with qc_pass_strict.snplist (change PLINK_SNP_QC in make-regenie-step1-job-scripts.sh)
