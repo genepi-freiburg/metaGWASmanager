@@ -8,6 +8,7 @@ then
 	exit 1
 fi
 
+mkdir -p jobs return_pheno output_pheno regenie_temp logs
 chmod 0755 *.jobs
-mkdir -p return_pheno output_pheno regenie_temp logs
+
 Rscript consortium.R $1 pheno | tee return_pheno/pheno_script_output.log

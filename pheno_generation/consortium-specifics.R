@@ -184,11 +184,8 @@ get_quantitative_trait_check_params <- function(input) {
   return(table)
 }
   
- 
-# FUNCTION 6 ---- CHECK ORDINAL INPUT COLUMNS
 
-
-# FUNCTION 7 ---- CHECK CATEGORICAL INPUT COLUMNS
+# FUNCTION 6 ---- CHECK CATEGORICAL INPUT COLUMNS
 # check categorical trait summaries
 # needs to return a data frame with the
 # types of categories
@@ -225,7 +222,7 @@ get_categorical_trait_check_params <- function() {
 }
 
 
-# FUNCTION 8 --- CALCULATE DERIVED PHENOTYPES BASED ON INPUT
+# FUNCTION 7 --- CALCULATE DERIVED PHENOTYPES BASED ON INPUT
 # including INT, etc.
 # including sex stratification (or other stratifications)
 calculate_derived_phenotypes <- function(result, parameters_list) {
@@ -302,30 +299,25 @@ calculate_derived_phenotypes <- function(result, parameters_list) {
 }
 
 
-# FUNCTIONS 9 --- PERFORM SPECIALIZED QC
+# FUNCTIONS 8 --- PERFORM SPECIALIZED QC
 # works on all data, including normalized / derived phenotpes
 
-#Function 9.a. Get categorical variables
-get_categorical_variables <- function() {
-  c("sex", "smoking_urinemetal", "smoking_bloodmetal", "smoking_plasmametal")
-}
-
-#Function 9.b. Get binary variables
+#Function 8.a. Get binary variables
 get_binary_cols<- function() {
   c("sex")
 }
 
-#Function 9.c. Get  number of minimum cases to study the variable
+#Function 8.b. Get  number of minimum cases to study the variable
 get_number_cases<- function() {
   c(500)
 }
 
-#Function 9.d. vector with categorical variables
+#Function 8.c. vector with categorical variables
 get_cat_cols<- function() {
   c("smoking_urinemetal", "smoking_plasmametal")
 }
 
-#Function 9.e. Create a vector with the age_variable (names of this vector are the specific variables)
+#Function 8.d. Create a vector with the age_variable (names of this vector are the specific variables)
 get_age_for_phenotype<- function() {
   urine_metals<- c ("cadmium_urine", "cadmium_urine_female", "cadmium_urine_male", "cadmium_urine_neversmk",
                       "selenium_urine", "selenium_urine_female", "selenium_urine_male", "selenium_urine_neversmk",
@@ -347,7 +339,7 @@ get_age_for_phenotype<- function() {
 ###             Mode =  "Jobs"             ##
 ##############################################
 
-# FUNCTION 11 --- DETERMINE PHENOTYPES/COVARIABLES
+# FUNCTION 9 --- DETERMINE PHENOTYPES/COVARIABLES
 # returns a data.frame with the following columns
 # phenotype - name of the data to be used as a phenotype
 # covariables - comma-separated list of quantitative covariables to use in this analysis
@@ -385,13 +377,6 @@ determine_phenotypes_covariables <- function() {
   
   #3. Create a data frame
   data_frame <- data.frame(
-    #Define strata. Three options here: overall, sex_stratified, Smk_stratified
-    strata =  ifelse(grepl("_male$", quant_pheno1) | grepl("_female$", quant_pheno1) |
-                       grepl("_male$", quant_pheno2) | grepl("_female$", quant_pheno2),
-                     "sex_stratified",
-                     ifelse(grepl("_neversmk$", quant_pheno1) | grepl("_neversmk$", quant_pheno2),
-                            "smk_stratified",
-                            "overall")),
     #Define type of phenotype. In this example we only have quantitative outcomes.
     type = c(rep("quantitative", length(quant_pheno1)), 
              rep("quantitative", length(quant_pheno2)), 
@@ -408,12 +393,11 @@ determine_phenotypes_covariables <- function() {
                   rep(paste(cat_covar2, collapse = ", "), length(quant_pheno2)))
   )
   
-  colnames(data_frame) <- c("Strata" ,"Type" ,"Phenotypes", "Quant_covar", "Cat_covar")
+  colnames(data_frame) <- c("Type" ,"Phenotypes", "Quant_covar", "Cat_covar")
   
    #Be careful with  stratification (omit sex and smk variable in sex_stratified and Smk_stratified, respectively)
-  data_frame$Cat_covar[data_frame$Strata == "sex_stratified"] <- gsub("sex,", "", data_frame$Cat_covar[data_frame$Strata == "sex_stratified"])
-  data_frame$Cat_covar[data_frame$Strata == "smk_stratified"] <- gsub(", smoking_urinemetal", "", data_frame$Cat_covar[data_frame$Strata == "smk_stratified"])
-  data_frame$Cat_covar[data_frame$Strata == "smk_stratified"] <- gsub(", smoking_plasmametal", "", data_frame$Cat_covar[data_frame$Strata == "smk_stratified"])
+  data_frame$Cat_covar<- ifelse(grepl("_male$", data_frame$Phenotypes) | grepl("_female$", data_frame$Phenotypes), gsub("sex,", "", data_frame$Cat_covar),data_frame$Cat_covar)
+  data_frame$Cat_covar<- ifelse(grepl("_neversmk$", data_frame$Phenotypes), "sex",data_frame$Cat_covar)
   
   return(data_frame)
     

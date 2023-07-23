@@ -1,6 +1,7 @@
 # TODO do we need to take care of paths?
 source("consortium-specifics.R")
 
+# Use "get_consortium_name" function modified by the consortium core
 print(paste0("Welcome to the ",get_consortium_name (), " script!"))
 
 #Check if the two required arguments are given
@@ -351,7 +352,7 @@ write.table(result, data_fn,
 print("Calculate QT summary statistics")
 
 if (mode == "pheno") {
-plots_fn = paste0("return_pheno/", fn_end_string, "_plots.pdf")
+plots_fn <- paste0("return_pheno/", fn_end_string, "_plots.pdf")
 pdf(plots_fn)
 }
 
@@ -395,9 +396,7 @@ print("Quantitative")
 
 #Vector with unrelevant columns for the summary statistics
 unrelevant_cols <- c("FID", "IID")
-#Get categorical variables.  Use "get_categorical_variables" function modified by the consortium core
-categorical_variables <- get_categorical_variables()
-quant_cols <- colnames(result)[!(colnames(result) %in% c(unrelevant_cols, categorical_variables, all_study_covar_cols))]
+quant_cols <- colnames(result)[!(colnames(result) %in% c(unrelevant_cols, parameters_categorical_df$variable, all_study_covar_cols))]
 
 #Use "get_binary_cols" function modified by the consortium core
 binary_cols <- c (get_binary_cols())
@@ -523,7 +522,7 @@ for (idx in 1:nrow(summary_statistics)) {
   
 }
 
-dev.off()
+#dev.off()
 
 # end of 'if (mode == "pheno")'
 }
@@ -576,11 +575,11 @@ for (column_name in binary_cols) {
 
   if (column_name != "sex") {
     if (summary_statistics[i, "no_or_male"] < n.cases) {
-      print(paste0("WARNING: Less than ",n.cases , " 500 cases for ", column_name))
+      print(paste0("WARNING: Less than ",n.cases , " cases for ", column_name))
     }
 
     if (summary_statistics[i, "yes_or_female"] < n.cases) {
-      print(paste0("WARNING: Less than ",n.cases , " 500 controls for ", column_name))
+      print(paste0("WARNING: Less than ",n.cases , " controls for ", column_name))
     }
   }
 
@@ -614,8 +613,6 @@ for (idx in 1:nrow(summary_statistics)) {
                        ", n = ", n, ", NA = ", nav),
           cex.sub = 0.9)
 }
-
-dev.off()
 
 # end of 'if (mode == "pheno")'
 }
@@ -651,8 +648,6 @@ if (mode == "pheno") {
   write.table(summary_statistics, summary_fn, row.names = F, col.names = T, sep = "\t", quote = F)
   
   # Plot
-  plots_fn = paste0("return_pheno/", fn_end_string, "_plots_categorical.pdf")
-  pdf(plots_fn, width = 10, height = 8) 
   for(column_name in cat_cols){
     sub_sum_stat<- subset(summary_statistics, Variable == column_name)
     values <- as.numeric(sub_sum_stat$N)
@@ -701,6 +696,11 @@ run_idx = 0
 #Use "determine_phenotypes_covariables" function modified by the consortium core
 jobs_phenos <- determine_phenotypes_covariables ()
 
+#Create "strata" column as constant.
+# Use "get_consortium_name" function modified by the consortium core
+jobs_phenos$Strata<- get_consortium_name()
+
+
 #print(paste("Building jobs for", stratum, type))
 phenos<- jobs_phenos$Phenotypes
 
@@ -724,7 +724,7 @@ for (pheno in phenos) {
   }
   
   quant_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Quant_covar"], study_covar_cols)
-  cat_covars <- c("sex", jobs_phenos[jobs_phenos$Phenotypes == pheno, "Quant_covar"], study_cat_covar_cols)
+  cat_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Cat_covar"], study_cat_covar_cols)
   stratum <- jobs_phenos[jobs_phenos$Phenotypes == pheno, "Strata"]
   type <- jobs_phenos[jobs_phenos$Phenotypes == pheno, "Type"]
   
