@@ -394,14 +394,9 @@ skewness <- function(x, na.rm = FALSE) {
 # QUANTITATIVE Summary statistics ----------------------------------
 print("Quantitative")
 
-#Vector with unrelevant columns for the summary statistics
+#Vector with irrelevant columns for the summary statistics
 unrelevant_cols <- c("FID", "IID")
 quant_cols <- colnames(result)[!(colnames(result) %in% c(unrelevant_cols, parameters_categorical_df$variable, all_study_covar_cols))]
-#Vector with irrelevant columns for the summary statistics
-irrelevant_cols <- c("FID", "IID")
-#Get categorical variables.  Use "get_categorical_variables" function modified by the consortium core
-categorical_variables <- get_categorical_variables()
-quant_cols <- colnames(result)[!(colnames(result) %in% c(irrelevant_cols, categorical_variables, all_study_covar_cols))]
 
 #Use "get_binary_cols" function modified by the consortium core
 binary_cols <- c (get_binary_cols())
@@ -701,12 +696,6 @@ run_idx = 0
 #Use "determine_phenotypes_covariables" function modified by the consortium core
 jobs_phenos <- determine_phenotypes_covariables ()
 
-#Create "strata" column as constant.
-# Use "get_consortium_name" function modified by the consortium core
-jobs_phenos$Strata<- get_consortium_name()
-
-
-#print(paste("Building jobs for", stratum, type))
 phenos<- jobs_phenos$Phenotypes
 
 missing_phenos <- c()
@@ -730,11 +719,10 @@ for (pheno in phenos) {
   
   quant_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Quant_covar"], study_covar_cols)
   cat_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Cat_covar"], study_cat_covar_cols)
-  stratum <- jobs_phenos[jobs_phenos$Phenotypes == pheno, "Strata"]
   type <- jobs_phenos[jobs_phenos$Phenotypes == pheno, "Type"]
   
   run_idx = run_idx + 1
-  print(paste0("== RUN ", run_idx, ": ", type, ", stratum: ", stratum))
+  print(paste0("== RUN ", run_idx, ": ", type))
   print(paste0("Phenotype: ", pheno))
   print(paste0("Quantitative covariates: ", paste(quant_covars, collapse=", ")))
   print(paste0("Categorical covariates: ", paste(cat_covars, collapse=", ")))
@@ -746,7 +734,6 @@ for (pheno in phenos) {
                parameters_list$refpanel, " ",
                parameters_list$analysis_date, " ",
                type, " ",
-               stratum, " ",
                pheno, " '",
                paste(quant_covars, collapse=","), "' '",
                paste(cat_covars, collapse=","), "' ",

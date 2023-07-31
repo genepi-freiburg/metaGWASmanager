@@ -1,4 +1,9 @@
-print("Welcome to the CKDgen R5 post-processing script!")
+# TODO do we need to take care of paths?
+source("consortium-specifics.R")
+
+# Use "get_consortium_name" function modified by the consortium core
+print(paste0("Welcome to the ",get_consortium_name (), " post-processing script!"))
+
 
 ##################################################################################
 

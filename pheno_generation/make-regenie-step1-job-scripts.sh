@@ -3,11 +3,11 @@
 # please adjust these paths to match your environment
 # you may also adjust the job scheduler settings below
 
-REGENIE=/data/programs/bin/gwas/regenie/regenie_v2.2.4.gz_x86_64_Linux
+REGENIE=regenie
 # path to the genotype data
-PLINK_DATA_PREFIX=/data/studies/00_GCKD/00_data/01_genotypes/02_clean_data/02_Common_Genotyped_Maf1_Call96_HWE5/regenieQc/GCKD_Common_Clean_REGENIE
-PLINK_SNP_QC=qc/qc_pass.snplist
-PLINK_INDIV_QC=qc/qc_pass.id
+PLINK_DATA_PREFIX=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline/chip_Genotypes/qc/change_ID2/sample_number/vhsCDK_def2ns
+PLINK_SNP_QC=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline/chip_Genotypes/qc/change_ID2/sample_number/vhsCDK_def2ns.snplist
+PLINK_INDIV_QC=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline/chip_Genotypes/qc/change_ID2/sample_number/vhsCDK_def2ns.id
 
 TEMP_DIR=./regenie_temp
 mkdir -p $TEMP_DIR logs output_regenie_step1 output_regenie_step2 jobs
@@ -18,11 +18,10 @@ ANCESTRY=$2
 REFPANEL=$3
 ANALYSIS_DATE=$4
 BINARY_OR_QUANTITATIVE=$5
-OVERALL_OR_SEXSTRATIFIED=$6
-PHENOTYPE_COLUMNS=$7
-COVARIABLE_COLUMNS=$8
-CATEGORIAL_COVARIABLE_COLUMNS=$9
-RUN_INDEX=${10}
+PHENOTYPE_COLUMNS=$6
+COVARIABLE_COLUMNS=$7
+CATEGORIAL_COVARIABLE_COLUMNS=$8
+RUN_INDEX=${9}
 
 BT_OPTION=""
 if [ "$BINARY_OR_QUANTITATIVE" == "binary" ]
@@ -37,11 +36,15 @@ else
 	CATCOVAR_OPT=""
 fi
 
-cat > jobs/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_regenie_step1_${RUN_INDEX}_${BINARY_OR_QUANTITATIVE}_${OVERALL_OR_SEXSTRATIFIED}_${PHENOTYPE_COLUMNS}.sh << EndOfCommand
+cat > jobs/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_regenie_step1_${RUN_INDEX}_${BINARY_OR_QUANTITATIVE}_${PHENOTYPE_COLUMNS}.sh << EndOfCommand
 #!/bin/bash
 
+#SBATCH --chdir=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline
+
 # job name (abbreviated)
-#SBATCH -J r1_${BINARY_OR_QUANTITATIVE::1}${OVERALL_OR_SEXSTRATIFIED::1}_${RUN_INDEX}
+#SBATCH -J r1_${BINARY_OR_QUANTITATIVE::1}${RUN_INDEX}
+
+#SBATCH --partition=long_idx
 
 # number of nodes
 #SBATCH -N 1
@@ -56,19 +59,20 @@ cat > jobs/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_regenie_step1_${RUN
 #SBATCH --cpus-per-task=8
 
 # stdout file name (%j: job ID)
-#SBATCH -o logs/slurm-regenie_step1_${BINARY_OR_QUANTITATIVE}_${OVERALL_OR_SEXSTRATIFIED}_${RUN_INDEX}_%j.out
+#SBATCH -o logs/slurm-regenie_step1_${BINARY_OR_QUANTITATIVE}_${RUN_INDEX}_%j.out
 
 # stderr file name (%j: job ID)
-#SBATCH -e logs/slurm-regenie_step1_${BINARY_OR_QUANTITATIVE}_${OVERALL_OR_SEXSTRATIFIED}_${RUN_INDEX}_%j.err
+#SBATCH -e logs/slurm-regenie_step1_${BINARY_OR_QUANTITATIVE}_${RUN_INDEX}_%j.err
 
 # max run time (hh:mm:ss)
 #SBATCH -t 96:00:00
+
+module load regenie/3.2.1
 
 $REGENIE \\
   --step 1 \\
   --bed ${PLINK_DATA_PREFIX} \\
   --extract ${PLINK_SNP_QC} \\
-  --keep ${PLINK_INDIV_QC} \\
   --phenoFile output_pheno/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}.data.txt \\
   --phenoColList ${PHENOTYPE_COLUMNS} \\
   --covarFile output_pheno/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}.data.txt \\
@@ -79,7 +83,7 @@ $CATCOVAR_OPT  --bsize 1000 \\
   --threads 8 \\
   --maxCatLevels 99 \\
   --gz \\
-  --out output_regenie_step1/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_${BINARY_OR_QUANTITATIVE}_${OVERALL_OR_SEXSTRATIFIED}_${RUN_INDEX} \\
+  --out output_regenie_step1/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_${BINARY_OR_QUANTITATIVE}_${RUN_INDEX} \\
 $BT_OPTION
 EndOfCommand
 

@@ -368,7 +368,7 @@ determine_phenotypes_covariables <- function() {
   quant_covar1<- c("age_urinemetal", "bmi_urinemetal", "egfr_urinemetal",
                    paste0("PC", 1:parameters_list$pc_count))
   
-  quant_covar2<- c("age_plasmametal", "bmi_plasmametal", "egfr_plasmametal",
+  quant_covar2<- c("age_plasmametal", "bmi_plasmametal",
                    paste0("PC", 1:parameters_list$pc_count))
   
   #3.B. Categorical covariates:
@@ -385,12 +385,12 @@ determine_phenotypes_covariables <- function() {
     phenotype = c(quant_pheno1, quant_pheno2),
     
     #Define quantitative covariates. 
-    quant_covar = c(rep(paste(quant_covar1, collapse = ", "), length(quant_pheno1)), 
-                    rep(paste(quant_covar2, collapse = ", "), length(quant_pheno2))),
+    quant_covar = c(rep(paste(quant_covar1, collapse = ","), length(quant_pheno1)), 
+                    rep(paste(quant_covar2, collapse = ","), length(quant_pheno2))),
     
     #Define categorical covariates. 
-    cat_covar = c(rep(paste(cat_covar1, collapse = ", "), length(quant_pheno1)), 
-                  rep(paste(cat_covar2, collapse = ", "), length(quant_pheno2)))
+    cat_covar = c(rep(paste(cat_covar1, collapse = ","), length(quant_pheno1)), 
+                  rep(paste(cat_covar2, collapse = ","), length(quant_pheno2)))
   )
   
   colnames(data_frame) <- c("Type" ,"Phenotypes", "Quant_covar", "Cat_covar")
