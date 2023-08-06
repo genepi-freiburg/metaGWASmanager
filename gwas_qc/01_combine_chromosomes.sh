@@ -5,6 +5,8 @@
 # it adds a PVAL column as 10^-LOG10P,
 # it uses bgzip and tabix on the file(s)
 
+module load snippy/4.4.1-foss-2018b-Perl-5.28.0
+
 IN_PATH=$1
 OUT_PATH=$2
 

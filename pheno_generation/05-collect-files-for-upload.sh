@@ -7,6 +7,6 @@ then
 fi
 
 MY_DATE=$(date +%F)
-OUTFN=ckdgen-r5-upload-$1-${MY_DATE}.tgz
+OUTFN=consortium-upload-$1-${MY_DATE}.tgz
 echo "Building .tar.gz archive: $OUTFN"
 tar czvf $OUTFN return_pheno output_regenie_step2 output_regenie_step1/*.log logs
