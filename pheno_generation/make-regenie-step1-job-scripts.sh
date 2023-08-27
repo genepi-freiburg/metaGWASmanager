@@ -73,6 +73,7 @@ $REGENIE \\
   --step 1 \\
   --bed ${PLINK_DATA_PREFIX} \\
   --extract ${PLINK_SNP_QC} \\
+  --keep ${PLINK_INDIV_QC} \\
   --phenoFile output_pheno/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}.data.txt \\
   --phenoColList ${PHENOTYPE_COLUMNS} \\
   --covarFile output_pheno/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}.data.txt \\

@@ -137,7 +137,7 @@ all_summary_statistics = data.frame(
 
 # Step 4.3. Create function that sumarize all variables ----------------------------------------------------------------------------
 summarize_all_variable = function(all_summary_statistics, pheno_data, pheno, var) {
-  print(paste0(" - summarize quantitative variable: ", pheno, "/", var))
+  print(paste0(" - summarize variable: ", pheno, "/", var))
   
   # variable row counter
   i = nrow(all_summary_statistics) + 1
@@ -175,18 +175,11 @@ summarize_all_variable = function(all_summary_statistics, pheno_data, pheno, var
  if (var %in% c(quantitative_phenotypes, quantitative_variables)) {
    summ = summary(pheno_data[, var])
    
-   my_na = 0
-   if (length(summ) > 6) {
-     my_na = summ[7]
-   }
-
    all_summary_statistics[i, "min"] = summ[1]
    all_summary_statistics[i, "q1"] = summ[2]
    all_summary_statistics[i, "med"] = summ[3]
    all_summary_statistics[i, "q3"] = summ[5]
    all_summary_statistics[i, "max"] = summ[6]
-   all_summary_statistics[i, "n"] = length(which(!is.na(pheno_data[,var])))
-   all_summary_statistics[i, "na"] = my_na
    all_summary_statistics[i, "mean"] = summ[4]
    all_summary_statistics[i, "sd"] = sd(pheno_data[,var], na.rm = T)
    all_summary_statistics[i, "kurtosis"] = kurtosis(pheno_data[,var], na.rm = T)
