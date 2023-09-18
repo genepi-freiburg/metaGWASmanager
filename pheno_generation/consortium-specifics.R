@@ -94,7 +94,7 @@ perform_unit_normalization <- function (input, parameters_list) {
       input[, variable] <- input[, variable]*10  #conversion from ug/dl to ug/l
     }
   }
-  
+
   #B. Unit normalization for other variables (same structure as above)
   other.variables<- c ("creatinine_urine")
   for (variable in other.variables) {
@@ -102,8 +102,8 @@ perform_unit_normalization <- function (input, parameters_list) {
     unit.name = paste0(variable, "_unit")
     if (length(!is.na(input[, variable])) > 0 & parameters_list[unit.name] == -1) {
       stop(paste0( variable, " in input file, but units not given in parameter file."))
-    } 
-    
+    }
+ 
     if (length(!is.na(input[, variable])) > 0 & parameters_list[unit.name] == 1) {
       input[, variable] <- input[, variable]/100  #conversion from mg/dl to g/l
     }
@@ -128,7 +128,10 @@ get_quantitative_trait_check_params <- function(input) {
   
   #Merge quantitative vectors into a single one
   quantitative_variables <- c(quant_vec1, quant_vec2, quant_vec3, quant_vec4, quant_vec5, quant_vec6)
-  
+
+  # restrict to existing columns 
+  quantitative_variables=quantitative_variables[which(quantitative_variables %in% names(input))]
+
   #Create the required parameters for the quantitative variables
   absolute_min <- NA
   absolute_max <- NA

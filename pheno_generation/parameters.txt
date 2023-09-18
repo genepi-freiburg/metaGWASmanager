@@ -1,69 +1,102 @@
 # Name of your participant-level input file.
 # Please see the analysis plan for the required file format.
-input_file input.txt
+input_file YOUR_STUDY.txt
 
 # Name of your study.
 # This is used to name the output files.
-study_name test_study
+study_name your_study_name
 
 # e-mail address of the analyst conducting this analysis
 # (that's probably YOU who is completing this file).
 # may be used to contact you in case of technical questions
 # with the returns
-analyst_email_contact ""
+analyst_email_contact "contact@domain.edu"
 
 # Ancestry for this run
 # Use EUR for European ancestry, AA for African American,
 # AFR for African, EAS for East Asian, SAS for South Asian,
 # HIS for Hispanic, IA for Indian ancestry or as applicable
-ancestry ""
+ancestry "EUR"
 
 # Date of your analysis
 # please use yyyyMMdd, e.g. 20220704
-analysis_date ""
+analysis_date 20231224
 
 # Imputation reference panel
 # use TopMed, 1KGPph3v5 or HRC, as applicable
-refpanel ""
+refpanel "HRC"
 
-# was an Jaffee assay before 2009 used to measure creatinine?
-# Give 0 or 1, default is 0; if answered 1 (<2009), creatinine is corrected by 0.95.
-correct_jaffe 0
+# Unit of urine cadmium
+# 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
+cadmium_urine_unit 1
 
-# Unit of serum creatinine measurement.
-# 0 = umol/l, 1 = mg/dl, give -1 if you do not have serum creatinine
-creatinine_serum_unit 1
+# Unit of urine selenium
+# 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
+selenium_urine_unit 0
 
-# Unit of urine creatinine measurement.
-# 0 = umol/l, 1 = mg/dl, give -1 if you do not have urinary creatinine
+# Unit of urine arsenium
+# 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
+arsenic_urine_unit 0
+
+# Unit of plasma cadmium
+# 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
+cadmium_plasma_unit 0
+
+# Unit of plasma selenium 
+# 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
+selenium_plasma_unit 0
+
+# Unit of plasma arsenium
+# 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
+arsenic_plasma_unit 0
+
+# LOD of urine cadmium
+# give -1 if you do not have urine cadmium
+cadmium_urine_lod 2.89
+
+# LOD of urine selenium
+# give -1 if you do not have urine selenium
+selenium_urine_lod 2.89
+
+# LOD of urine arsenium 
+# give -1 if you do not have urine arsenium 
+arsenic_urine_lod 2.89
+
+# LOD of plasma cadmium
+# give -1 if you do not have plasma cadmium
+cadmium_plasma_lod 2.89
+
+# LOD of plasma selenium
+# give -1 if you do not have plasma selenium
+selenium_plasma_lod 2.89
+
+# LOD of plasma arsenium
+# give -1 if you do not have plasma arsenium
+arsenic_plasma_lod 2.89
+
+# Are urine metals available?
+# # "yes" or "no" 
+urine_metals_available "yes"
+
+# Unit of urinary creatinine
+# 0 = g/l, 1 = mg/dl, give -1 if you do not have
 creatinine_urine_unit 1
 
-# Unit of serum cystatin measurement.
-# 0 = nmol/l, 1 = mg/l, give -1 if you do not have serum cystatin
-cystatin_serum_unit 1
+# Unit of specific gravity
+# give -1 if you do not have specific gravity
+specific_gravity_unit -1
 
-# Unit of urate/uric acid measurement.
-# 0 = umol/l, 1 = mg/dl, give -1 if you do not have urate
-urate_unit 0
+# Are blood metal available?
+# give -1 if you do not have blood metal available
+blood_metals_available "yes"
 
-# Unit of total serum calcium measurement.
-# 0 = mmol/l, 1 = mg/dl, give -1 if you do not have calcium
-calcium_unit 0
+# Are plasma metal avilable?
+# "yes" or "no" 
+plasma_metals_available "yes"
 
-# Unit of serum phosphate measurement.
-# 0 = mmol/l, 1 = mg/dl, give -1 if you do not have serum phosphate
-phosphate_unit 0
-
-# Unit of serum albumin measurement.
-# 0 = g/dl, 1 = g/l, give -1 if you do not have serum albumin
-albumin_serum_unit 0
-
-# Unit of urine albumin measurement.
-# 0 = mg/dl, 1 = mg/l, give -1 if you do not have urine albumin
-albumin_urine_unit 1
-
-# Limit of detection for urinary albumin.
-lod_urinary_albumin 0
+# Were plasma metal measured in plasma or serum?
+# "plasma" or "serum" or give -1 if you do not have plasma metals available
+plasma_or_serum "plasma"
 
 # how many PCs to use as covariables
 # (need to be named PC1..PCx)
@@ -81,52 +114,3 @@ additional_covariables ""
 # use this option for categorical covariables such as study center
 additional_categorical_covariables ""
 
-# whether CKD or MA are calculated externally and given as input, 1
-# or if they are derived (from eGFR/UACR), 0
-# default: 0; please do not set without speaking to us first
-ckd_calculated_externally 0
-ma_calculated_externally 0
-
-
-# Assay used for measurement of blood creatinine (e.g., Jaffe, enzymatic)
-blood_crea_assay ""
-
-# Was blood creatinine measured in serum or plasma (give "serum" or "plasma")
-blood_crea_specimen ""
-
-# Assay used for measurement of blood cystatin C (e.g., ELISA, Particle-Enhanced Turbidimetric Immunoassay (PETIA))
-blood_cystc_assay ""
-
-# Was blood cystatin C measured in serum or plasma (give "serum" or "plasma")
-blood_cystc_specimen ""
-
-# Method used for measurement of blood urate (e.g., uricase method)
-blood_urate_assay ""
-
-# Was blood urate measured in serum or plasma (give "serum" or "plasma")
-blood_urate_specimen ""
-
-# Assay used for measurement of blood albumin (e.g., colorimetric)
-blood_albumin_assay ""
-
-# Was blood albumin measured in serum or plasma (give "serum" or "plasma")
-blood_albumin_specimen ""
-
-# Assay used for measurement of blood phosphate (e.g., colorimetric)
-blood_phosphate_assay ""
-
-# Was blood phosphate measured in serum or plasma (give "serum" or "plasma")
-blood_phosphate_specimen ""
-
-# Assay used for measurement of blood calcium (e.g., colorimetric) 
-# If your study measured ionized calcium or albumin-adjusted serum calcium, please get in touch with us!
-blood_calcium_assay ""
-
-# Was blood calcium measured in serum or plasma (give "serum" or "plasma")
-blood_calcium_specimen ""
-
-# Assay used for measurement of urine albumin (e.g., nephelometric, immunoturbidimetric, etc.)
-urine_albumin_assay ""
-
-# Assay used for measurement of urine creatinine (e.g., colorimetric).
-urine_creatinine_assay ""
