@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-STURY_DIR=$1
+SCRIPT_DIR= $SCRIPTS_DIR
+STUDY_DIR=$1
 if [ ! -d "$1" ]
 then
 	echo "ERROR: please give directory with result files as first argument"

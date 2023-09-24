@@ -1,7 +1,7 @@
 STUDY=$1
 OUT_FN=$2
 
-SCRIPT_PREFIX=/storage/scripts/ckdgenR5/gwas_qc
+SCRIPT_PREFIX= $SCRIPTS_DIR
 EXTRACT_FILE="/tmp/extract-${RANDOM}.txt"
 POSITIVE_FILE="/tmp/positive-${RANDOM}.txt"
 

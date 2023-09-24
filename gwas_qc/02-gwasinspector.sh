@@ -8,8 +8,12 @@ then
 	exit 3
 fi
 
+source ./folders.config.sh $STUDY_NAME
+
 #IMAGE=/home/mwuttke/SingularityTest/gwasinspector.simg
-MYDIR=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline_core/uploads/assoc/$STUDY_NAME
+MYDIR=$GWAS_UPLOAD_DIR
+
+echo $MYDIR
 
 if [ ! -d "$MYDIR" ]
 then
@@ -20,16 +24,16 @@ fi
 if [ ! -f "$MYDIR/config.ini" ]
 then
 	echo "config.ini not found: Creating one."
-	cat /data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline_core/scripts/gwas_qc/GWASinspector/config.ini.template | sed s/STUDY_NAME/$STUDY_NAME/g > $MYDIR/config.ini
+	cat ${SCRIPTS_DIR}/GWASinspector/config.ini.template | sed -e "s/CLEANING_DIR/$(echo $CLEANING_DIR | sed 's/\//\\\//g')/g" -e "s/REF_DIR/$(echo $REF_DIR | sed 's/\//\\\//g')/g" > $MYDIR/config.ini
 fi
 
-mkdir -p /data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline_core/cleaning/$STUDY_NAME/qc-output
+mkdir -p ${CLEANING_DIR}/qc-output
 
 echo "Run singularity GWASinspector"
 #singularity exec \
 #	--bind /storage \
 #	$IMAGE 
 	cd $MYDIR 
-	Rscript /storage/scripts/ckdgenR5/gwas_qc/GWASinspector/gwasinspector.R \
+	Rscript ${SCRIPTS_DIR}/GWASinspector/gwasinspector.R \
 	2>&1 | tee 02-gwasinspector.log
 

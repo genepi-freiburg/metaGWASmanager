@@ -5,8 +5,15 @@
 # it adds a PVAL column as 10^-LOG10P,
 # it uses bgzip and tabix on the file(s)
 
-IN_PATH=$1
-OUT_PATH=$2
+STUDY_ID=$1
+
+source ./folders.config.sh $STUDY_ID
+
+echo "GWAS_UPLOAD_DIR: $GWAS_UPLOAD_DIR"
+echo "CLEANING_DIR: $CLEANING_DIR"
+
+IN_PATH=${GWAS_UPLOAD_DIR}/output_regenie_step2 
+OUT_PATH=${CLEANING_DIR}/data
 
 if [ ! -d "$IN_PATH" ]
 then

@@ -1,5 +1,5 @@
 library(GWASinspector)
-job <- setup.inspector("config.ini")
+job <- setup_inspector("config.ini")
 job
-job <- run.inspector(job)
+job <- run_inspector(job)
 

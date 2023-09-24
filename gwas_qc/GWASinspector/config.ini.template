@@ -24,15 +24,14 @@ filename = .+gwas\.gz$
 # Prefix for output file and plot namess. default value is 'QC'.
 filename_output_tag = QC
 
-
 # Folder containing the input file(s) (do not use a trailing slash)
-dir_data = /storage/cleaning/ckdgenR5/STUDY_NAME/data
+dir_data = CLEANING_DIR/data
 
 # Folder where the output will be placed. default value is 'dir_data' folder (do not use a trailing slash)
-dir_output = /storage/cleaning/ckdgenR5/STUDY_NAME/qc-output
+dir_output = CLEANING_DIR/qc-output
 
 # Folder containing reference and header files. default value is 'dir_data' folder (do not use a trailing slash)
-dir_references = /storage/databases
+dir_references = REF_DIR
 
 
 
