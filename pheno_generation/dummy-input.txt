@@ -1,2 +1,4 @@
-IID	FID	sex	age_baseline	PC1	PC2	PC3	PC4	PC5	PC6	PC7	PC8	PC9	PC10	crea_serum	albumin_serum	cystc_serum	crea_urine	phosphate_serum	albumin_urine	gout	calcium_serum	urate_serum	age_screa	age_scys	age_salb	age_spho	age_scal	age_suac	age_urine	age_gout
-xyz	abc	M	64	0.0032	0.0045	0.0229	0.0121	-0.0047	-0.0135	-0.016	-0.0089	0.0272	-0.0074	1.24	39.09	1.298	72.639999	1.12	14.01	0	2.2	8.94	64	64	64	64	64	64	64	64
+IID	FID	sex	age_urinemetal	smoking_urinemetal	egfr_urinemetal	bmi_urinemetal	creatinine_urine	age_bloodmetal	smoking_bloodmetal	bmi_bloodmetal	age_plasmametal	smoking_plasmametal	bmi_plasmametal	selenium_urine	arsenic_urine	cadmium_plasma	selenium_plasma	arsenic_plasma	PC1	PC2	PC3	PC4	PC5	PC6	PC7	PC8	PC9	PC10	PC11
+1	2001	M	38.69	F	142.36	31.24	176.39	26.91	C	34.47	68.96	C	32.47	21.05	31.33	36.48	37.21	31.31	0.29	0.2	0.52	0.97	0.69	0.73	0.94	0.64	0.76	0.38	0.03
+2	2002	F	70.45	N	126.88	26.39	130.7	79	N	33.84	53.22	N	35.78	35.51	20.65	31.43	39.88	31.04	0.24	0.62	0.62	0.61	0.67	0.47	0.94	0.03	0.34	0.6	0.49
+3	2003	F	60.76	C	42.48	39.75	185.25	65.21	F	28.03	48.23	F	31.18	25.57	23.26	26.32	38.42	37.7	0.35	0.9	0.49	0.54	0.93	0.43	0.67	0.28	0.51	0	0.36

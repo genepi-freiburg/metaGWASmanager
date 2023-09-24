@@ -57,8 +57,7 @@ standard_required_parameters<-  c(
 required_parameters<-  c(
   standard_required_parameters,
   get_required_parameters(parameters)
-); length(required_parameters)
-
+); 
 
 #Get parameters list using  "get_parameter" function.
 parameters_list <- list()
@@ -109,6 +108,10 @@ if (mode == "pheno") {
 #############################################################################
 #Read input file
 print(paste0("Reading input file: ", parameters_list$input_file))
+
+if(!file.exists(parameters_list$input_file))
+	stop(paste("The provided input file",parameters_list$input_file,"does not exist!\nPlease check if the file exists and if you provided the correct file name!"))
+
 input <- read.table(file = parameters_list$input_file, header = T)
 # to account for sample ids that appear numeric and start with leading zeros
 # check number of columns, assign ID columns as character
@@ -126,10 +129,10 @@ required_columns <- c( "FID", "IID", "sex")
 
 #Get required columns. Use "get_required_columns" function modified by the consortium core
 #include PC columns
-required_columns <- c(required_columns, get_required_columns(parameters_list), paste0("PC", 1:parameters_list$pc_count)); length(required_columns)
+required_columns <- c(required_columns, get_required_columns(parameters_list), paste0("PC", 1:parameters_list$pc_count));  # length(required_columns)
 
 #Get optional columns Use "get_optional_columns" function modified by the consortium core
-optional_columns <- c( get_optional_columns()); length(optional_columns)
+optional_columns <- c( get_optional_columns());  # length(optional_columns)
 
 #Check presence of required columns
 is_column_present <- function(col_name) {
@@ -192,9 +195,11 @@ check_quantitative <- function(values, param_name, absolute_min, absolute_max,
     
     above_max = which(values > absolute_max)
     if (length(above_max) > 0) {
-      stop(paste0("inconsistent values for ", param_name, ": rows ",
-                  paste(values[above_max], collapse=", "),
-                  " are above absolute maximum of ", absolute_max))
+		# suggestion my Mathias:
+      stop(paste0("There are ",length(which(values > absolute_max)),
+				" values of ",param_name, " above absolute maximum of ", absolute_max,"\n"
+				,"Listed here are the first 10 row numbers that are above the maximum: ",
+				paste(head(which(values > absolute_max),10), collapse=", ")))
     }
     
     value_median = median(values, na.rm = T)
