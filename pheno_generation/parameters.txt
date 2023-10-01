@@ -87,12 +87,12 @@ creatinine_urine_unit 1
 specific_gravity_unit -1
 
 # Are blood metal available?
-# give -1 if you do not have blood metal available
-blood_metals_available "yes"
+# "yes" or "no" 
+blood_metals_available 1
 
 # Are plasma metal avilable?
 # "yes" or "no" 
-plasma_metals_available "yes"
+plasma_metals_available 1
 
 # Were plasma metal measured in plasma or serum?
 # "plasma" or "serum" or give -1 if you do not have plasma metals available

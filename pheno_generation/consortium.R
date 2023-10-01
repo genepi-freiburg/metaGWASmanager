@@ -57,7 +57,7 @@ standard_required_parameters<-  c(
 required_parameters<-  c(
   standard_required_parameters,
   get_required_parameters(parameters)
-); 
+) 
 
 #Get parameters list using  "get_parameter" function.
 parameters_list <- list()

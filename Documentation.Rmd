@@ -1,0 +1,134 @@
+---
+title: "GWAS Consortium standardization pipeline documentation"
+author: Pascal Schlosser, Zulema Rodriguez-Hernandez, Mathias Gorski, Maria Tellez,
+  Matthias Wuttke
+date: "1/10/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Overview**
+
+- General info
+- Diferent parts of pipeline (Add workflow)
+
+![Workflow](Z:/ftp/zrodriguez/proyectos/GWAS_consortium_standardization_pipeline/workflow.png)
+
+---
+
+# **Installation**
+
+
+---
+
+# **Required files and programs**
+
+Linux programs:
+
+module load snippy/4.4.1-foss-2018b-Perl-5.28.0
+module load HTSlib/1.15.1-GCC-11.3.0
+module load R/4.1.0-foss-2021a
+module load FlexiBLAS/3.2.0-GCC-11.3.0
+
+---
+
+# **Step by step guide**
+
+## **Step 1: Server structure**
+Suggestions:
+
+Should reflect:
+·        process, such as phase1 - phenotypes, phase2 - GWAS, phase3 - meta-analysis
+·        study / phenotype
+·        multiple rounds?
+For CKDgen
+
+### Scripts
+o   keep scripts separate from data
+o   /storage/scripts/ckdgenR5/
+    §  and then sub-folders for the different phases (e.g, "gwas_qc")
+o   how I would do it today:
+    §  /storage/ckdgenR5/scripts/
+
+### Phase 1 / Pheno Upload
+o   /storage/uploads/ckdgenR5/pheno/GCKD_2022-10-04/
+§  ==> it's uploads
+§  ==> it's CKDgen Round 5
+§  ==> it's phenotype uploads
+§  ==> it's the GCKD study, with the upload data 2022-10-04.
+o   how I would do it today:
+§  /storage/ckdgenR5/uploads/pheno/GCKD_2022-01-04
+o   what happens if GCKD re-uploads:
+§  we move GCKD_2022-10-04 to a sub directory called "00_ARCHIVE"
+§  we ignore 00_ARCHIVE (and 00_SUMMARY) in all scripts that walk the PHENO_UPLOAD_DIR
+§  we make a novel folder GCKD_2023-01-01 with the revised phenotypes
+§  (the 00_SUMMARY dir has code to generate cross-study phenotype summaries)
+
+
+### Phase 2 / GWAS Upload
+
+o   /storage/uploads/ckdgenR5/assoc/GCKD_2022-10-04
+§  ==> it's now GWAS uploads
+o   how I would do it today:
+§  /storage/ckdgenR5/uploads/assoc/GCKD_2022-10-04
+o   as a manual process, I keep folder names between PHENO_UPLOAD_DIR and GWAS_UPLOAD_DIR in sync. why? to know which studies have phenotypes but no GWAS, and in order to be able to compare files from both folders.
+o   In case of a re-upload, I manually rename or copy the phenotype directory (there is a script that gives all mismatches). The old GWAS goes to 00_ARCHIVE as well.
+
+### Phase 3 / Cleaning
+o   /storage/cleaning/ckdgenR5/GCKD_2022-10-04
+§  contains intermediate files (most importantly, sub-folder "data")
+§  contains logs and cleaning result
+o   how I would do it today:         	
+§  /storage /ckdgenR5/cleaning/GCKD_2022-10-04
+
+### Phase 4 / Metaanalysis
+o   /storage/metaanalysis/ckdgenR5/eGFR
+§  contains folders per analysis / phenotype etc.
+§  out of scope for manuscript
+o   how I would do it today:         	
+§  /storage/ckdgenR5/metaanalysis/eGFR
+
+
+
+## **Step 2: Pheno_Generation process**
+Explain a little 
+Link cohorts guide because they have to provide them
+Consortium_specificts
+Suggestions/advices
+
+
+## **Step 3: GWAS_QC by study**
+
+### "Folder.config" file
+Maybe have a "folders.config" file that has
+Each consortium can modify to fit their needs.
+PREFIX=/storage/ckdgenR5
+SCRIPTS_DIR=$PREFIX/scripts
+PHENO_UPLOAD_DIR=$PREFIX/uploads/pheno/$STUDY_ID
+GWAS_UPLOAD_DIR=$PREFIX/uploads/assoc/$STUDY_ID
+CLEANING_DIR=$PREFIX/cleaning/$STUDY_ID
+ 
+
+### Combine chromosomes
+
+### Gwas inspector
+
+
+### Positive controls
+
+
+### QC stats
+
+
+## **Step 4:  GWAS_QC all studies**
+Two options:
+Manual check (Provide a type of guide as CKDGen R5 QC)
+Script checks
+
+---
+
+# **Test run**
+Provide an example??

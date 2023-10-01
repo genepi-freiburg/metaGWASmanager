@@ -5,6 +5,13 @@
 ############################################################################################
 setwd("Z:/ftp/zrodriguez/proyectos/CKD/Quality_control")
 
+source("consortium-specifics.R")
+
+##Get QC table thresholds
+tolerance_table<- get_QC_tolerance()
+
+
+
 ## LIBRARIES
 library(data.table)
 
@@ -18,6 +25,7 @@ if( !file.exists( folder ) ) {
 ############################################################################################################
 # Step 1.1.  Read  database ----------------------------------------------------------------------------
 qc_stats<- read.csv("data/qc-stats.csv"); dim(qc_stats)  #1207   92
+positive_controls<- read.csv("data/positive-controls.csv"); dim(positive_controls)  #1237   20
 
 ############################################################################################################
 #   STEP 2.  Transform db into a list (one element of a list  by study population)
@@ -75,27 +83,29 @@ function_QCGWAS<-function(qc_list){
   #                Summary stats                  #
   #-----------------------------------------------#
   # A) p-value ("PVAL")
-  pval.tolerance <- 0.05 #We can be more or less restrictive #Consortium specifics?
-  pval.conditions <- c(qc_list[, "PVALUE_MAX_ALL"] == 1 & qc_list[, "PVALUE_MAX_HQ"] == 1 &
-                          abs(qc_list[, "PVALUE_MED_ALL"] - 0.5) <= pval.tolerance & abs(qc_list[, "PVALUE_MED_HQ"] - 0.5)  <= pval.tolerance & 
-                          abs(qc_list[, "PVALUE_Q1_ALL"] - 0.25) <= pval.tolerance  & abs(qc_list[, "PVALUE_Q1_HQ"] - 0.25)  <= pval.tolerance &
-                         abs(qc_list[, "PVALUE_Q3_ALL"] - 0.75) <= pval.tolerance  & abs(qc_list[, "PVALUE_Q3_HQ"] - 0.75)  <= pval.tolerance &
-                         !is.unsorted(qc_stats[, c("PVALUE_MIN_ALL", "PVALUE_Q1_ALL", "PVALUE_MED_ALL", "PVALUE_Q3_ALL", "PVALUE_MAX_ALL")]) &
-                         !is.unsorted(qc_stats[, c("PVALUE_MIN_HQ", "PVALUE_Q1_HQ", "PVALUE_MED_HQ", "PVALUE_Q3_HQ", "PVALUE_MAX_HQ")]))
-  pval <- ifelse(pval.conditions, "OK", "NOT OK")
+  pval_results<- character()
+  for (ph in pheno) {
+    pval.tolerance <- tolerance_table$pval.tol[tolerance_table$phenotype == ph]
+    pval.conditions <- c(qc_list[qc_list$PHENO== ph, "PVALUE_MAX_ALL"] <= 1 & qc_list[qc_list$PHENO== ph, "PVALUE_MAX_HQ"] <= 1 &
+                           abs(qc_list[qc_list$PHENO== ph, "PVALUE_MED_ALL"] - 0.5) <= pval.tolerance & abs(qc_list[qc_list$PHENO== ph, "PVALUE_MED_HQ"] - 0.5)  <= pval.tolerance & 
+                           abs(qc_list[qc_list$PHENO== ph, "PVALUE_Q1_ALL"] - 0.25) <= pval.tolerance  & abs(qc_list[qc_list$PHENO== ph, "PVALUE_Q1_HQ"] - 0.25)  <= pval.tolerance &
+                           abs(qc_list[qc_list$PHENO== ph, "PVALUE_Q3_ALL"] - 0.75) <= pval.tolerance  & abs(qc_list[qc_list$PHENO== ph, "PVALUE_Q3_HQ"] - 0.75)  <= pval.tolerance &
+                           !is.unsorted(qc_stats[qc_list$PHENO== ph, c("PVALUE_MIN_ALL", "PVALUE_Q1_ALL", "PVALUE_MED_ALL", "PVALUE_Q3_ALL", "PVALUE_MAX_ALL")]) &
+                           !is.unsorted(qc_stats[qc_list$PHENO== ph, c("PVALUE_MIN_HQ", "PVALUE_Q1_HQ", "PVALUE_MED_HQ", "PVALUE_Q3_HQ", "PVALUE_MAX_HQ")]))
+    pval <- ifelse(pval.conditions, "OK", "NOT OK")
+    pval_results<- cbind(pval_results, pval)
+  }
+  pval_results<- as.vector(pval_results)
   
   # B) Lambda ("LAMBDA)  #Differentiate among  traits
   lambda_results<- character()
   for (ph in pheno) {
-    if (ph %in% c("ckd", "ma", "gout")) {  #create function for all pheno
-      lambda.tolerance<- 0.1 ##Consortium specifics?
-    }else {
-      lambda.tolerance<- 0.04 ##Consortium specifics?
-    }
+    lambda.tolerance<- tolerance_table$lambda.tol[tolerance_table$phenotype == ph]
     lambda.conditions<- c(abs(qc_list[qc_list$PHENO== ph, "LAMBDA"] - 1) <= lambda.tolerance)
     lambda<- ifelse(lambda.conditions, "OK", "NOT OK")
     lambda_results<- cbind(lambda_results, lambda)
   }
+  
   lambda_results<- as.vector(lambda_results)
 
   # C) Effect allele frequency ("A1FREQ")
@@ -107,23 +117,24 @@ function_QCGWAS<-function(qc_list){
 
   
   # D) Imputation quality ("IMPQUAL")
-  impqual.tolerance<- 0.1
-  impqual.conditions<- c(qc_list[, "IMP_QUALITY_MIN_ALL"]>= 0.3 & qc_list[, "IMP_QUALITY_MIN_HQ"]>= 0.3 &
-                           qc_list[, "IMP_QUALITY_MAX_ALL"]== 1 & qc_list[, "IMP_QUALITY_MAX_HQ"]== 1 &
-                           abs(qc_list[, "IMP_QUALITY_MED_ALL"] - 1)<= impqual.tolerance & abs(qc_list[, "IMP_QUALITY_MED_HQ"] - 1)  <= impqual.tolerance &
-                           !is.unsorted(qc_list[, c("IMP_QUALITY_MIN_ALL", "IMP_QUALITY_Q1_ALL", "IMP_QUALITY_MED_ALL", "IMP_QUALITY_Q3_ALL", "IMP_QUALITY_MAX_ALL")]) == "TRUE" &
-                           !is.unsorted(qc_list[, c("IMP_QUALITY_MIN_HQ", "IMP_QUALITY_Q1_HQ", "IMP_QUALITY_MED_HQ", "IMP_QUALITY_Q3_HQ", "IMP_QUALITY_MAX_HQ")]) == "TRUE")
-  impqual<- ifelse(impqual.conditions, "OK", "NOT OK")
-
+  impqual_results<- character()
+  for (ph in pheno) {
+    impqual.tolerance<- tolerance_table$impqual.tol[tolerance_table$phenotype == ph]
+    impqual.conditions<- c(qc_list[qc_list$PHENO== ph, "IMP_QUALITY_MIN_ALL"]>= 0.3 & qc_list[qc_list$PHENO== ph, "IMP_QUALITY_MIN_HQ"]>= 0.3 &
+                             qc_list[qc_list$PHENO== ph, "IMP_QUALITY_MAX_ALL"]== 1 & qc_list[qc_list$PHENO== ph, "IMP_QUALITY_MAX_HQ"]== 1 &
+                             abs(qc_list[qc_list$PHENO== ph, "IMP_QUALITY_MED_ALL"] - 1)<= impqual.tolerance & abs(qc_list[qc_list$PHENO== ph, "IMP_QUALITY_MED_HQ"] - 1)  <= impqual.tolerance &
+                             !is.unsorted(qc_list[qc_list$PHENO== ph, c("IMP_QUALITY_MIN_ALL", "IMP_QUALITY_Q1_ALL", "IMP_QUALITY_MED_ALL", "IMP_QUALITY_Q3_ALL", "IMP_QUALITY_MAX_ALL")]) == "TRUE" &
+                             !is.unsorted(qc_list[qc_list$PHENO== ph, c("IMP_QUALITY_MIN_HQ", "IMP_QUALITY_Q1_HQ", "IMP_QUALITY_MED_HQ", "IMP_QUALITY_Q3_HQ", "IMP_QUALITY_MAX_HQ")]) == "TRUE")
+    impqual<- ifelse(impqual.conditions, "OK", "NOT OK") 
+    impqual_results<- cbind(impqual_results, impqual)
+  }
+  impqual_results<- as.vector(impqual_results)
+  
   
   # E) Effect size ("BETA")
   beta_results<- character()
   for (ph in pheno) {
-    if (grepl("_male$", ph) || grepl("_female$", ph)) {  
-      beta.tolerance<- 5 
-    }else {
-      beta.tolerance<- 0.05 
-    }
+    beta.tolerance<- tolerance_table$beta.tol[tolerance_table$phenotype == ph]
     beta.conditions<- c(abs(qc_list[qc_list$PHENO== ph, "BETA_MED_ALL"] - 0) <= beta.tolerance & abs(qc_list[qc_list$PHENO== ph, "BETA_MED_HQ"] - 0)  <= beta.tolerance &
                           abs(qc_list[qc_list$PHENO== ph, "BETA_MIN_ALL"]) >= abs(qc_list[qc_list$PHENO== ph, "BETA_MIN_HQ"]) &
                           abs(qc_list[qc_list$PHENO== ph, "BETA_Q1_ALL"]) >= abs(qc_list[qc_list$PHENO== ph, "BETA_Q1_HQ"]) &
@@ -153,9 +164,14 @@ function_QCGWAS<-function(qc_list){
   #-----------------------------------------------#
   #          Allele frequency correlation         #  ###### Somth BES-610 Sample size? should we add a if?
   #-----------------------------------------------#
-  afreq.corr.tolerance<- 0.1
-  afreq.corr.conditions<- c(abs(qc_list[, "AF_CORRELATION_ALL"] - 1)<= afreq.corr.tolerance)
-  afreq.corr<- ifelse(afreq.corr.conditions, "OK", "NOT OK")
+  afreq.corr_results<- character()
+  for (ph in pheno) {
+    afreq.corr.tolerance<- tolerance_table$afreq.tol[tolerance_table$phenotype == ph]
+    afreq.corr.conditions<- c(abs(qc_list[qc_list$PHENO== ph, "AF_CORRELATION_ALL"] - 1)<= afreq.corr.tolerance)
+    afreq.corr<- ifelse(afreq.corr.conditions, "OK", "NOT OK") 
+    afreq.corr_results<- cbind(afreq.corr_results, afreq.corr)
+  }
+  afreq.corr_results<- as.vector(afreq.corr_results)
   
   #-----------------------------------------------#
   #            Variants per chromosome            #
@@ -186,7 +202,8 @@ function_QCGWAS<-function(qc_list){
   
   #Inter pheno comparison 
   #Create list with type of phenotype categories
-  category_suff <- c("int", "male", "female")
+  quantitative_rows <- tolerance_table[tolerance_table$type == "quantitative", ]
+  category_suff <- unique(sapply(strsplit(quantitative_rows$phenotype, "_"), function(x) tail(x, 1)))
   categories_list<-list()
   for (suff in category_suff) {
     categories_list[[suff]] <- variants[grep(paste0(suff, "$"), rownames(variants)), ]
@@ -255,7 +272,7 @@ function_QCGWAS<-function(qc_list){
     }
   }
 
-  result <- cbind(study, pheno, pop, pval,lambda_results, impqual, beta_results, stderr,afreq.corr, var.per.chr, posit.control$result)
+  result <- cbind(study, pheno, pop, pval_results, lambda_results, e.afreq, impqual_results, beta_results, stderr,afreq.corr_results, var.per.chr, posit.control$result)
   table <- rbind(table, result)
   return(table)
 }
@@ -273,8 +290,8 @@ print(stop- start)
 # Step 4.4. Join results (elements of a list) and write ----------------------------------------------------------------------------
 res_final<-do.call("rbind",res_sub); print(dim(res_final)) #413   7
 res_final <- as.data.frame(res_final, row.names = F)
-names(res_final) <- c("study", "pheno", "pop", "pval","lambda", "impqual", "beta","stderr", "allel_freq", "vars.per.chr", "positive_control") 
-write.csv(res_final,  paste0(folder,"QC_CKDGenR5.csv"), row.names = F)
+names(res_final) <- c("study", "pheno", "pop", "pval","lambda", "effect_afreq", "impqual", "beta","stderr", "allel_freq", "vars.per.chr", "positive_control") 
+write.csv(res_final,  paste0(folder,"QC_", get_consortium_name (), ".csv"), row.names = F)
 
 
 

@@ -8,7 +8,7 @@ get_consortium_name <- function() {
 
 
 ##############################################
-###              Mode =  "Pheno"           ##
+###              Mode =  "Pheno"            ##
 ##############################################
 # FUNCTION 1 --- PARAMETERS FILE
 # this function should return the names of the parameters
@@ -21,6 +21,13 @@ get_required_parameters<- function (parameters) {
   required_parameters<- c( "cadmium_urine_unit",  "selenium_urine_unit", "arsenic_urine_unit", "cadmium_plasma_unit",  "selenium_plasma_unit","arsenic_plasma_unit", 
     "cadmium_urine_lod", "selenium_urine_lod", "arsenic_urine_lod",  "cadmium_plasma_lod", "selenium_plasma_lod" ,"arsenic_plasma_lod",
     "urine_metals_available", "blood_metals_available", "plasma_metals_available")
+  
+  variables <- c("blood_metals_available", "urine_metals_available", "plasma_metals_available")
+  for (var in variables) {
+    if (!(parameters$value[parameters$key == var] %in% c("yes", "no"))) {
+      stop(paste0("Please provide ", var, " in your parameter file as either 'yes' or 'no'"))
+    }
+  }
   
   if (parameters$value[parameters$key== "urine_metals_available"]=="yes") {
     required_parameters <- c(required_parameters, 
@@ -147,9 +154,9 @@ get_quantitative_trait_check_params <- function(input) {
       mean <- mean(input[ , variable], na.rm = T)
       sd <- sd(input[ , variable], na.rm = T)
       absolute_min <- 0
-      absolute_max <- mean+1000*sd  #Ask Maria 
+      absolute_max <- mean+1000*sd   
       median_min <- 0
-      median_max <- mean+1000*sd  ##Ask Maria 
+      median_max <- mean+1000*sd   
     } else if (variable %in% quant_vec2) {
       absolute_min <- 0
       absolute_max <- 100000 
@@ -248,11 +255,15 @@ calculate_derived_phenotypes <- function(result, parameters_list) {
   #Vector with variables to perform the smoking stratification
   var.smoke.strat <- c ("cadmium_urine", "selenium_urine", "arsenic_urine", "cadmium_plasma", "selenium_plasma", "arsenic_plasma")
   
+  
   #1. Imputation [LOD/sqrt(2)] metals values <LOD LOD/sqrt(2)
     for(colname in colnames(result)){
       if (colname %in% vars.to.impute) {
         lod.var <- paste0(colname, "_lod")
         lod <- as.numeric(parameters_list[lod.var])
+        if (!lod >= 0) {
+          stop(paste0("Please provide a correct LOD (positive and numeric value) for ", lod.var))
+        }
         result[, colname] <- ifelse(result[, colname] < lod, lod/sqrt(2), result[, colname])
       }
     }
@@ -339,7 +350,7 @@ get_age_for_phenotype<- function() {
   
 
 ##############################################
-###             Mode =  "Jobs"             ##
+###             Mode =  "Jobs"              ##
 ##############################################
 
 # FUNCTION 9 --- DETERMINE PHENOTYPES/COVARIABLES
@@ -405,4 +416,77 @@ determine_phenotypes_covariables <- function() {
   return(data_frame)
     
 }
+
+
+##############################################
+###                  GWAS QC                ##
+##############################################
+# FUNCTION 10 --- DEFINE QC THRESHOLDs
+# returns a data.frame with the threshold values
+get_QC_tolerance <- function() {
+  
+  #1.Define your quantitative phenotypes vectors:
+  quant_pheno1<- c("cadmium_urine", "cadmium_urine_female", "cadmium_urine_male", "cadmium_urine_neversmk",
+                   "selenium_urine", "selenium_urine_female", "selenium_urine_male", "selenium_urine_neversmk",
+                   "arsenic_urine", "arsenic_urine_female", "arsenic_urine_male", "arsenic_urine_neversmk")
+  
+  quant_pheno2<- c("cadmium_plasma", "cadmium_plasma_female", "cadmium_plasma_male", "cadmium_plasma_neversmk",
+                   "selenium_plasma", "selenium_plasma_female", "selenium_plasma_male", "selenium_plasma_neversmk",
+                   "arsenic_plasma", "arsenic_plasma_female", "arsenic_plasma_male", "arsenic_plasma_neversmk" )
+  
+  #2. Define your binary phenotypes
+  binary_pheno<-c()
+
+  #3. Define QC tolerance
+  pval.tolerance<- 0.05
+  lambda.tolerance<- 0.04
+  lambda.tolerance.binary<- 0.1  #Less restrictive
+  impqual.tolerance<- 0.1
+  beta.tolerance<- 0.05
+  beta.tolerance.stratified<- 5 ##Less restrictive
+  afreq.corr.tolerance<- 0.1
+
+  #4. Create a data frame
+  data_frame <- data.frame(
+    #Define type of phenotype. In this example we only have quantitative outcomes.
+    type = c(rep("quantitative", length(quant_pheno1)), 
+             rep("quantitative", length(quant_pheno2)), 
+             rep("binary", length(binary_pheno))), 
+    
+    phenotype = c(quant_pheno1, quant_pheno2, binary_pheno),
+    
+    pval.tol= c(rep(pval.tolerance, length(quant_pheno1)),
+                rep(pval.tolerance, length(quant_pheno2)),
+                rep(pval.tolerance, length(binary_pheno))),
+
+    lambda.tol = c(rep(lambda.tolerance, length(quant_pheno1)),
+                   rep(lambda.tolerance, length(quant_pheno2)),
+                   rep(lambda.tolerance.binary, length(binary_pheno))),
+
+    beta.tol= c(rep(beta.tolerance, length(quant_pheno1)),
+                rep(beta.tolerance, length(quant_pheno2)),
+                rep(beta.tolerance, length(binary_pheno))),
+
+    afreq.tol= c(rep(afreq.corr.tolerance, length(quant_pheno1)),
+                 rep(afreq.corr.tolerance, length(quant_pheno2)),
+                 rep(afreq.corr.tolerance, length(binary_pheno))),
+
+    impqual.tol= c(rep(impqual.tolerance, length(quant_pheno1)),
+                 rep(impqual.tolerance, length(quant_pheno2)),
+                 rep(impqual.tolerance, length(binary_pheno)))
+  )
+
+  #Be careful with  stratification (omit sex and smk variable in sex_stratified and Smk_stratified, respectively)
+  data_frame$beta.tol <- ifelse(grepl("_male$", data_frame$phenotype) | grepl("_female$", data_frame$phenotype) | grepl("_neversmk$", data_frame$phenotype), beta.tolerance.stratified, beta.tolerance)
+
+  return(data_frame)
+  
+}
+
+
+
+
+
+
+
 
