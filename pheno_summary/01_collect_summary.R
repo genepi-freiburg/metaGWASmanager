@@ -1,6 +1,5 @@
 parameters = data.frame()
-bt_summaries = data.frame()
-qt_summaries = data.frame()
+ids_summaries = data.frame()
 
 collect_parameters = function(fn, row_idx, parameters) {
 	params_pattern = "parameters"
@@ -44,52 +43,28 @@ collect_parameters = function(fn, row_idx, parameters) {
 	return(parameters)
 }
 
-collect_bts = function(fn, row_idx, bt_summaries, study) {
-	bt_fn = list.files(paste0("../", fn), pattern="*_bt_summary.txt")
-        if (length(bt_fn) != 1) {
-                stop(paste0("expect single BT summary file, but got zero or multiple: ", bt_fn, sep="", collapse=";"))
-        }
-        print(paste0("read BT summary file: ", bt_fn))
-        data = read.table(paste0("../", fn, "/", bt_fn), h=T)
-        print(paste0("got BT summaries: ", nrow(data)))
 
-	bt_summaries[row_idx, "study"] = study
+collect_ids = function(fn, row_idx, ids_summaries, study) {
+        ids_fn = list.files(paste0("../", fn), pattern="*_ids_summary.txt")
+        if (length(ids_fn) != 1) {
+                stop(paste0("expect single summary file, but got zero or multiple: ", ids_fn, sep="", collapse=";"))
+        }
+        print(paste0("read summary file: ", ids_fn))
+        data = read.delim (paste0("../", fn, "/", ids_fn), h=T)
+        print(paste0("got summaries: ", nrow(data)))
+        #data <- replace(data, is.na(data), "-")
+
+        ids_summaries[row_idx, "study"] = study
 
         for (var_idx in 1:nrow(data)) {
+                pheno= data[var_idx, "phenotype"]
                 var = data[var_idx, "variable"]
-                bt_summaries[row_idx, paste0(var, "_n")] = data[var_idx, "n"]
-                bt_summaries[row_idx, paste0(var, "_na")] = data[var_idx, "na"]
-                if (var != "sex") {
-                        bt_summaries[row_idx, paste0(var, "_no")] = data[var_idx, "no_or_male"]
-                        bt_summaries[row_idx, paste0(var, "_yes")] = data[var_idx, "yes_or_female"]
-                } else {
-                        bt_summaries[row_idx, paste0(var, "_male")] = data[var_idx, "no_or_male"]
-                        bt_summaries[row_idx, paste0(var, "_female")] = data[var_idx, "yes_or_female"]
+                for (stat in c("min", "q1", "med", "q3", "max", "mean", "sd", "kurtosis", "skewness", "n", "na", "cat1", "cat2", "cat3", "categories")) {
+                  ids_summaries[row_idx, paste0( pheno,"_",var, "_", stat)] = data[var_idx, stat]
                 }
         }
 
-	return(bt_summaries)
-}
-
-collect_qts = function(fn, row_idx, qt_summaries, study) {
-        qt_fn = list.files(paste0("../", fn), pattern="*_qt_summary.txt")
-        if (length(qt_fn) != 1) {
-                stop(paste0("expect single QT summary file, but got zero or multiple: ", qt_fn, sep="", collapse=";"))
-        }
-        print(paste0("read QT summary file: ", qt_fn))
-        data = read.table(paste0("../", fn, "/", qt_fn), h=T)
-        print(paste0("got QT summaries: ", nrow(data)))
-
-        qt_summaries[row_idx, "study"] = study
-
-        for (var_idx in 1:nrow(data)) {
-                var = data[var_idx, "variable"]
-                for (stat in c("min", "q1", "med", "q3", "max", "n", "na", "mean", "sd", "kurtosis", "skewness")) {
-                        qt_summaries[row_idx, paste0(var, "_", stat)] = data[var_idx, stat]
-                }
-        }
-
-	return(qt_summaries)
+	return(ids_summaries)
 }
 
 row_idx = 0
@@ -101,13 +76,11 @@ for (fn in list.files("..")) {
 		study = parameters[row_idx, "study_name"]
 		ancestry = parameters[row_idx, "ancestry"]
 		study = paste(study, ancestry, sep="_")
-		bt_summaries = collect_bts(fn, row_idx, bt_summaries, study)
-		qt_summaries = collect_qts(fn, row_idx, qt_summaries, study)
+		ids_summaries = collect_ids(fn, row_idx, ids_summaries, study)
 	}
 }
 
 write.table(parameters, "parameter-summary.txt", row.names=F, col.names=T, sep="\t", quote=F)
-write.table(bt_summaries, "bt-summaries.txt", row.names=F, col.names=T, sep="\t", quote=F)
-write.table(qt_summaries, "qt-summaries.txt", row.names=F, col.names=T, sep="\t", quote=F)
+write.table(ids_summaries, "ids-summaries.txt", row.names=F, col.names=T, sep="\t", quote=F)
 
 #print(parameters)
