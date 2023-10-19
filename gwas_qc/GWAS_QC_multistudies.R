@@ -3,63 +3,37 @@
 ########                            CKDGen R5 GWAS QC 230609                        ########
 ########                                                                            ########
 ############################################################################################
+
+#PATHS
 setwd("Z:/ftp/zrodriguez/proyectos/CKD/Quality_control")
-
+qc_stats_file<- "data/new/qc-stats.csv"
+positive_controls_file<- "data/new/positive-controls.csv"
 source("consortium-specifics.R")
-
-##Get QC table thresholds
-tolerance_table<- get_QC_tolerance()
-
-
-
-## LIBRARIES
-library(data.table)
 
 folder <- "CKDGen_GWAS-QC_results/"  
 if( !file.exists( folder ) ) {
   dir.create( file.path( folder ) )
 }
 
+## LIBRARIES
+library(data.table)
+
+
+##Get QC table thresholds
+tolerance_table<- get_QC_tolerance()
+
 ############################################################################################################
 #   STEP 1.  Read qc-stats.cvs file
 ############################################################################################################
-# Step 1.1.  Read  database ----------------------------------------------------------------------------
-qc_stats<- read.csv("data/qc-stats.csv"); dim(qc_stats)  #1207   92
-positive_controls<- read.csv("data/positive-controls.csv"); dim(positive_controls)  #1237   20
+qc_stats<- read.csv(paste0(qc_stats_file)); dim(qc_stats)  
 
 ############################################################################################################
 #   STEP 2.  Transform db into a list (one element of a list  by study population)
 ###########################################################################################################
 # Step 2.1. Check how many cohorts are in db  ----------------------------------------------------------------------------
-ids <- unique(qc_stats[, "STUDY"]); length(ids) #124
+ids <- unique(qc_stats[, "STUDY"]); length(ids) 
 
-# Step 2.2. Create column in qc_stats to compare with positive controls ----------------------------------------------------------------------------
-qc_stats$Positive_check<-gsub("\\d{4}-\\d{2}-\\d{2}", "", qc_stats$STUDY)#remove date
-qc_stats$Positive_check<-substr(qc_stats$Positive_check, 1, nchar(qc_stats$Positive_check) - 1)#remove last character (in some cases "_" in others "-")
-qc_stats$Positive_check<- tolower(qc_stats$Positive_check)
-#Make specific changes
-qc_stats[qc_stats$Positive_check == "allofus_afr", "Positive_check"] <- "aou_afr" 
-qc_stats[qc_stats$Positive_check == "allofus_amr", "Positive_check"] <- "aou_amr" 
-qc_stats[qc_stats$Positive_check == "allofus_eur", "Positive_check"] <- "aou_eur" 
-qc_stats[qc_stats$Positive_check == "allofus_eur", "Positive_check"] <- "aou_eur" 
-qc_stats[qc_stats$Positive_check == "genesandhealth", "Positive_check"] <- "genes-and-health" 
-qc_stats[qc_stats$Positive_check == "genoa", "Positive_check"] <- "genoa_eur" 
-qc_stats[qc_stats$Positive_check == "hypergenes", "Positive_check"] <- "hypergenes_study" 
-qc_stats[qc_stats$Positive_check == "ingi_car", "Positive_check"] <- "ingi-car" 
-qc_stats[qc_stats$Positive_check == "ingi_fvg", "Positive_check"] <- "ingi-fvg" 
-qc_stats[qc_stats$Positive_check == "ingi_vbi", "Positive_check"] <- "ingi-vbi" 
-qc_stats[qc_stats$Positive_check == "mgbb-afr", "Positive_check"] <- "mgbb_afr" 
-qc_stats[qc_stats$Positive_check == "mgbb-eur", "Positive_check"] <- "mgbb_eur" 
-qc_stats[qc_stats$Positive_check == "ukbb-afr", "Positive_check"] <- "ukbb_afr" 
-
-unique(qc_stats$Positive_check[!qc_stats$Positive_check %in% positive_controls$STUDY])
-
-#No positive controls for "ESTHER-Illumina", "ESTHER-Oncoarray"
-#Studies not found in positive_controls.xlsx --> JMICC, POPGEN, jupiter EA, mgi_eur, origin_his, chs_afr, ship_t
-#ORIGIN different date.why?
-
-
-# Step 2.3. List creation ----------------------------------------------------------------------------
+# Step 2.2. List creation ----------------------------------------------------------------------------
 qc_list <- list()
 for (id in ids){ 
   db_sub<- qc_stats [qc_stats [, "STUDY"] == id, ]
@@ -67,7 +41,7 @@ for (id in ids){
 }
 
 ############################################################################################################
-#   STEP 4.  Create GWAS-QC function
+#   STEP 3.  Create GWAS-QC function
 ###########################################################################################################
 
 function_QCGWAS<-function(qc_list){
@@ -176,9 +150,9 @@ function_QCGWAS<-function(qc_list){
   #-----------------------------------------------#
   #            Variants per chromosome            #
   #-----------------------------------------------#
-# b) should be consistent across phenotypes (gaps might indicate lost chunks)
-# c) expect lower counts for analyses with lower N (such as sex-stratified)
-  #Extract Variants columns and converto to numeric
+  # Should be consistent across phenotypes (gaps might indicate lost chunks)
+  # Expect lower counts for analyses with lower N (such as sex-stratified)
+  # Extract Variants columns and converto to numeric
   variants <- qc_list[, grep("^VARIANTS", colnames(qc_list))]
   convert_numeric <- function(variants) {
     if (grepl(",", variants)) {
@@ -234,35 +208,10 @@ function_QCGWAS<-function(qc_list){
   #-----------------------------------------------#
   #                Positive controls              #
   #-----------------------------------------------#
-  positive_controls<- read.csv("data/positive-controls.csv"); dim(positive_controls)  #1237   20
-  
-  #Homogenization col names
-  extract_info <- function(file_name) {
-    studies_to_be_care<- c("AllOfUs", "AoU", "ARIC", "BioBankJapan", "BioMe", "CCPM", "CHS", "CRIC", "DECODE", "DIACORE",
-                           "eMERGEIII", "FHS", "GENOA", "JUPITER", "MESA", "MGBB", "MGI","ORCADES", "UKBB", "VIKING", 
-                           "WGHS")  #BIOME in in qc_stats
-    parts <-  unlist(strsplit(file_name, "_|/"))
-    if (parts [3]%in% c("AFR", "AMR", "SAS", "EUR", "EAS", "AA", "EA", "CKDGen") & !(parts[2] %in% studies_to_be_care)) {
-      study<- parts [2]
-    } else {
-      study<- paste0(parts[2], "_", parts[3])
-    } 
-    pheno <- sub("^.*?_[0-9]+_(.*?)\\.gwas\\.gz$", "\\1", file_name)
-    return(c(study, pheno))
-  }
-  positive_controls[, c("STUDY", "PHENO")] <- t(sapply(positive_controls$file_name, extract_info)) 
-  positive_controls$STUDY <- tolower(positive_controls$STUDY)
-  positive_controls$STUDY[grepl("data/CKDGenR5_CMUHBDC_CRDR", positive_controls$file_name)] <- "cmuhbdc_crdr"
-  positive_controls$STUDY[grepl("data/CKDGenR5_CMUHBDC_TWB", positive_controls$file_name)] <- "cmuhbdc_twb"
-  positive_controls$STUDY[grepl("data/CKDGenR5_CMUHBDC_TWB_CLEAN", positive_controls$file_name)] <- "cmuhbdc_twb_clean"
-  positive_controls$STUDY[grepl("data/Living_Biobank_Chinese", positive_controls$file_name)] <- "living_biobank_chinese"
-  positive_controls$STUDY[grepl("data/Living_Biobank_Malay", positive_controls$file_name)] <- "living_biobank_malay"
-  positive_controls$STUDY[grepl("data/SHIP_T_B2", positive_controls$file_name)] <- "ship_t_b2"
-  
-
+  positive_controls<- read.csv(paste0(positive_controls_file)); dim(positive_controls)  
   
   #Subset positive controls  
-  subset_positive_controls <- subset(positive_controls, STUDY %in% qc_list$Positive_check)
+  subset_positive_controls <- subset(positive_controls, positive_controls$study_name %in% qc_list$STUDY)
   #Create table results
   posit.control<-as.data.frame(qc_list$PHENO)
   posit.control$result<-"NO_DATA"
