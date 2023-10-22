@@ -83,4 +83,17 @@ for (fn in list.files("..")) {
 write.table(parameters, "parameter-summary.txt", row.names=F, col.names=T, sep="\t", quote=F)
 write.table(ids_summaries, "ids-summaries.txt", row.names=F, col.names=T, sep="\t", quote=F)
 
-#print(parameters)
+# Change id_summaries format:
+
+ids <- read.delim("ids-summaries.txt", h=T)
+
+ids2 <- data.frame(t(ids))
+comb <- ids2[-1,]
+
+colnames(comb) <- ids2[1,]
+comb$variable <- c(colnames(ids)[2:length(ids)])
+
+write.table(comb, "summaries.txt", row.names=F, col.names=T, sep="\t", quote=F)
+
+
+
