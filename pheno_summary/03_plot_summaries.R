@@ -31,13 +31,16 @@ pdf("ids_summary_joined.pdf",width=15,height=9)
 i=2
 while (i <= (ncol(ids)-14)) {
   data <- ids[,i:(14+i)]
-
   phe <- unique(sapply(strsplit(colnames(data),"__", fixed = TRUE), `[`, 1))
 
   colnames(data) <- c(unique(sapply(strsplit(colnames(data),"__", fixed = TRUE), `[`, 2)))
   
+  data$Study<-ids$study
+  data<- data[rowSums(is.na(data)) < ncol(data)-1, ]
+  
+
   if(all(!is.na(data[, c("min", "q1", "med")]))) {
-    dat_gg <- data.frame(Study = paste(ids$study,c(paste0("(","NNA=",data$n,", ","NA=",data$na,")")), sep = "/"),    
+    dat_gg <- data.frame(Study = paste(data$Study,c(paste0("(","NNA=",data$n,", ","NA=",data$na,")")), sep = "/"),    
                          Min = data$min,
                          Q1 = data$q1,
                          Med = data$med,
@@ -61,7 +64,7 @@ while (i <= (ncol(ids)-14)) {
     # annotate("text", x = c(1:nrow(ids)), y = max(ids[,paste0(phe,"__max")],na.rm = TRUE)+1, label = c(paste0("(","NNA=",dat_gg$N,", ","NA=",dat_gg$miss,")")),  size=2.5)
     
   } else {
-    dat_cat <- data.frame(Study = paste(ids$study,c(paste0("(","NNA=",data$n,", ","NA=",data$na,")")), sep = "/"),    
+    dat_cat <- data.frame(Study = paste(data$Study,c(paste0("(","NNA=",data$n,", ","NA=",data$na,")")), sep = "/"),    
                         cat1= data$cat1,
                         cat2= data$cat2,
                         cat3= data$cat3,
