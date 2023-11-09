@@ -1,7 +1,6 @@
 ---
-title: "GWASConsortiumPrep documentation"
-author: Zulema Rodriguez-Hernandez, Mathias Gorski, Maria Tellez-Plaza, Pascal Schlosser, Matthias Wuttke
-date: "22/10/2023"
+title: "GWASCmanager documentation"
+date: "11/11/2023"
 output: html_document
 ---
 
@@ -10,30 +9,32 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # **Overview**
-This vignette introduces GWASConsortiumPrep, a comprehensive suite of tools  leveraging existing software packages and, streamlining the entire genomics-consortia workflow. This encompasses includes phenotype generation and, quality control of phenotypes, GWAS, and GWAS-QC, providing an integrated cohesive solution for both participating study analysts (PSA) and central consortium analystis group (CCAG).
+This vignette introduces the GWASmanager, a comprehensive toolbox leveraging existing software packages and, streamlining the entire GWAS-consortium workflow. This encompasses the phenotype generation, quality control of phenotypes, GWAS, and GWAS-QC, providing an integrated solution for both the participating study analysts (SA) and consortium analysts (CA). For a description please see the corresponding manuscript:
+Zulema Rodriguez-Hernandez, Mathias Gorski, Maria Tellez Plaza, Pascal Schlosser* and Matthias Wuttke* (2023). “GWASmanager: A toolbox for an automated workflow from phenotypes to meta-analysis in GWAS consortia”. under review.
 
 ![Workflow](Z:/ftp/zrodriguez/proyectos/GWAS_consortium_standardization_pipeline/workflow_figure/workflow_figure_231021_v2.jpg)
 
 ---
 
 # **Installation**
-
-TO DEFINE
+To set up the toolbox please fork the github repository:
+https://github.com/genepi-freiburg/gwas-consortium/tree/main
 
 ---
 
 # **Required files, programs and server**
-Aside from the documentation and scripts supplied by GWASConsortiumPrep, it is necessary to ensure that the following programs and files are properly installed and downloaded on your system.We recommend installing the most recent existing version.
+Aside from the documentation and scripts supplied by GWASmanager, it is necessary to ensure that the following programs and files are properly installed and downloaded on your system.
 
-## For PSAs
-- Analysis plan, scripts and examples files for conducting steps 1 and 3, provided by CCAG.
+## For SAs
 - [REGENIE](https://rgcgithub.github.io/regenie/)
 - [PLINK](https://zzz.bwh.harvard.edu/plink/) or [PLINK 2.0](https://www.cog-genomics.org/plink/2.0/).
 - [VCFtools](https://vcftools.sourceforge.net/man_latest.html) and [BCFtools](https://samtools.github.io/bcftools/bcftools.html)
 - [R](https://www.r-project.org/) software
+- Analysis plan, scripts and examples files for conducting steps 1 and 3 will be provided by the CA.
 
-## For CCAG
-Same as PSAs, but also:
+
+## For CAs
+Same as SA, but also:
 
 - [GWASInspector](https://cran.r-project.org/web/packages/GWASinspector/index.html) R package
   - SQLite reference data available [here](http://gwasinspector.com/#download)
@@ -43,13 +44,11 @@ Same as PSAs, but also:
 - [FlexiBLAS](https://www.mpi-magdeburg.mpg.de/projects/flexiblas)
 - [Python](https://www.python.org/)
 
-**¿Slurm?/aprox memory requirement?** 
-
 ### Server structure
 We outline the recommended structure for the consortium server to ensure effective and efficient data management:
 
 #### Scripts
-They should be separate from data, in a different folder. This folder will contain of scripts needed by CCAG.
+They should be separate from data, in a different folder. This folder will contain of scripts needed by CA.
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/scripts/"
@@ -57,19 +56,19 @@ They should be separate from data, in a different folder. This folder will conta
 
 
 #### Pheno Upload
-The phenotypes results (output of **Step 1: Phenotype preparation (PSAs)**, *pheno* mode) submitted by the PSAs will be stored in the *uploads/pheno* directory. This directory will contain a folder for each study that has submitted summary statistics.
+The phenotypes results (output of **Step 1: Phenotype preparation (SAs)**, *pheno* mode) submitted by the SAs will be stored in the *uploads/pheno* directory. This directory will contain a folder for each study that has submitted summary statistics.
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/uploads/pheno/Specific_study_name"
 ```
 
-In addition, it should be appeared two additional directories:
-- *00_ARCHIVE*.If a specific-study re-upload the phenotype summary statistics, perhaps due to the detection of an error CCAG will archive the previous version in this directory. 
-- *00_SUMMARY*.It has the code to generate cross-study phenotype summaries in the **Step 2: Manual phenotype checking (CCAG)**. The output of executing these scripts will be saved here.
+In addition, it should contain two additional directories:
+- *00_ARCHIVE*.If a specific-study re-upload the phenotype summary statistics, perhaps due to the detection of an error CA will archive the previous version in this directory. 
+- *00_SUMMARY*.It has the code to generate cross-study phenotype summaries in the **Step 2: Manual phenotype checking (CA)**. The output of executing these scripts will be saved here.
 
 
 #### GWAS Upload
-The GWAS results (output of **Step 3: Perform GWAS (PSAs)**) submitted by the PSAs will be stored in the *uploads/assoc* directory. This directory will contain a folder for each study that has submitted summary statistics.
+The GWAS results (output of **Step 3: Perform GWAS (SAs)**) submitted by the SAs will be stored in the *uploads/assoc* directory. This directory will contain a folder for each study that has submitted summary statistics.
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/uploads/assoc/Specific_study_name"
@@ -78,7 +77,7 @@ The GWAS results (output of **Step 3: Perform GWAS (PSAs)**) submitted by the PS
 It is advised to maintain consistency in the naming of studies withing both the *uploads/pheno* and *uploads/assoc* folders to prevent potential problems when cross-referencing files between the two folders.
 
 #### Cleaning
-Contains intermediate files,logs and summary files resulting from **Step 4: Participant-study GWAS-QC (CCAG)**. The sub-folder "*data*" contains the clean REGENIE results
+Contains intermediate files,logs and summary files resulting from **Step 4: Participant-study GWAS-QC (CA)**. The sub-folder "*data*" contains the clean REGENIE results
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/cleaning/Specific_study_name"
@@ -90,80 +89,82 @@ Contains intermediate files,logs and summary files resulting from **Step 4: Part
 # **Step by step guide**
 
 ## **Preparation of Consortium-specifics files and Analysis Plan**
-The initial stage involves generating Consortium-specific files (*Consortium-specifics.R* and *parameters.txt* plug-in) and formulating the Analysis Plan, in which CCAG will define, based on the provided GWASConsortiumPrep examples, the required settings for conducting the pool-cohort GWAS.
+The initial stage involves generating Consortium-specific files (*Consortium-specifics.R* and *parameters.txt* plug-in) and formulating the Analysis Plan, in which CA will define, based on the provided GWASConsortiumPrep examples, the required settings for conducting the pool-cohort GWAS.
 
 
 A) **Consortium-specifics.R**. 
-Consortium-specifics.R plug-in file should be edited according to the CCAG specifications. This file contains several functions such as unit conversion, traits transformations, verification of the input and parameteres files, setting quality control parameters, determination of covariates, etc. These functions will be applied in subsequent stages of the workflow process. 
-Consortium-specifics.R file will be provided, along the analysis plan and required scripts, to each PSAs.
+Consortium-specifics.R plug-in file should be edited according to the CA specifications. This file contains several functions such as unit conversion, traits transformations, verification of the input and parameteres files, setting quality control parameters, determination of covariates, etc. These functions will be applied in subsequent stages of the workflow process. 
+Consortium-specifics.R file will be provided, along the analysis plan and required scripts, to each SAs.
 
 B) **Parameters file** 
-CCAG will customize the *parameters.txt* file to match the particular traits to study. It must included important points, which must be filled out by the PSAs, such as the name of the input file and the participant-study, PSAs contact information, the study's ancestral background, the analysis date, the units of the variables to be studied, along with laboratory particular settings (e.g., limits of detection), the imputation reference panel, the number of genetic principal components, and some more optional fields.
+CA will customize the *parameters.txt* file to match the particular traits to study. It must included important points, which must be filled out by the SAs, such as the name of the input file and the participant-study, SAs contact information, the study's ancestral background, the analysis date, the units of the variables to be studied, along with laboratory particular settings (e.g., limits of detection), the imputation reference panel, the number of genetic principal components, and some more optional fields.
 
 
 C) **Analysis Plan**
-The Analysis Plan PDF document should provided comprehensive information for PSAs on to proceed with the different analyses, including **Step 1: Phenotype preparation** and **Step 3: Perform GWAS (PSAs)**. It is also essential to include contact details for CCAG in case any questions arise.
+The Analysis Plan PDF document should provided comprehensive information for SAs on to proceed with the different analyses, including **Step 1: Phenotype preparation** and **Step 3: Perform GWAS (SAs)**. It is also essential to include contact details for CA in case any questions arise.
 See [here](add) an example of Analysis Plann file.
 
 
-## **Step 1: Phenotype preparation (PSAs)**
-In a first step, CCAG will ask for preparation the phenotypic data for all participating studies. CCAG will supply an Analysis Plan and scripts (including the *Consortium-specifics.R* plug-in) that automatically generate descriptive statistics. Every available script will be executed by PSAs on a Linux server using the *bash* command line.
+## **Step 1: Phenotype preparation (SAs)**
+In a first step, CA will ask for preparation the phenotypic data for all participating studies. CA will supply an Analysis Plan and scripts (including the *Consortium-specifics.R* plug-in) that automatically generate descriptive statistics. Every available script will be executed by SAs on a Linux server using the *bash* command line.
 
-Input files for each participanting study, include an input data (*input.txt*) and a parameter file (*parameters.txt*) that PSAs will created and complete, respectively, according the CCAG guide standards.
+Input files for each participanting study, include an input data (*input.txt*) and a parameter file (*parameters.txt*) that SAs will created and complete, respectively, according the CA guide standards.
 
 During this initial phase (*pheno* mode), a comprehensive examination of the input and parameters files will be carried out. This involves issuing warnings and identifying errors to guarantee high-quality phenotypic data and prevent common pitfalls such as unit conversion discrepancies or variations in assay methods. Additionally, the pipeline executes essential trait transformations and calculations, ensuring uniformity in the phenotypic data.
 
-The files generated by phenotype preparation scripts include the phenotype summary statistics ("*Studyname_ids_summary.txt"*) and plots files, which will submit to CCAG for review.
+The files generated by phenotype preparation scripts include the phenotype summary statistics ("*Studyname_ids_summary.txt"*) and plots files, which will submit to CA for review.
 
-More information on how to run **Step 1: Phenotype preparation (PSAs)** is provided in the [Analysis Plan](TOADD) example.
+More information on how to run **Step 1: Phenotype preparation (SAs)** is provided in the [Analysis Plan](TOADD) example.
 
-## **Step 2: Manual phenotype checking (CCAG)**
-The graphical an summary statistics of phenotypes submitted by each PSA, will be stored in the *upload/pheno* directory, within the folder corresponding to the specific participating study.
+## **Step 2: Manual phenotype checking (CA)**
+The graphical an summary statistics of phenotypes submitted by each SA, will be stored in the *upload/pheno* directory, within the folder corresponding to the specific participating study.
 
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/uploads/pheno/Specific_study_name"
 ```
 
-Subsequently, CCAG will manually inspect these files in order to indentify potential issues and inconsistencies. Furthermore, CCAG will run the cross-study validation scripts (*"01_collect_summary.R" and "03_plot_summaries.R"*), located in the *"pheno_summary"* directory of the GWASConsortiumPrep toolkit. Both scripts summarize phenotype summary-statistics submissions ("*Studyname_ids_summary.txt"*)  across studies and also facilitate their representation for improved inter-study comparison and to detect potential outliers.
+Subsequently, CA will manually inspect these files in order to indentify potential issues and inconsistencies. Furthermore, CA will run the cross-study validation scripts (*"01_collect_summary.R" and "03_plot_summaries.R"*), located in the *"pheno_summary"* directory of the GWASConsortiumPrep toolkit. Both scripts summarize phenotype summary-statistics submissions ("*Studyname_ids_summary.txt"*)  across studies and also facilitate their representation for improved inter-study comparison and to detect potential outliers.
 
 Note that the generated outputs of the inter-study comparison analyses will be automatically saved in the *"00_SUMMARY"* folder located at the path mentioned above.
 
-After the inspection of submitted pthenotype summary statistics files, CCAG will provide feedback to PSAs. In the case CCAG detects an issue, it will be clearly outlined and assistance will be offered to the PSAs in oder to resolve it.  The PSAs will then revisit  **Step 1: Phenotype preparation (PSAs)** and re-submit the corresponding outputs files. Contrary, if no problems are identified, PSAs are authorized to proceed with **Step 3: Perform GWAS (PSAs)**.
+After the inspection of submitted pthenotype summary statistics files, CA will provide feedback to SAs. In the case CA detects an issue, it will be clearly outlined and assistance will be offered to the SAs in oder to resolve it.  The SAs will then revisit  **Step 1: Phenotype preparation (SAs)** and re-submit the corresponding outputs files. Contrary, if no problems are identified, SAs are authorized to proceed with **Step 3: Perform GWAS (SAs)**.
 
 
-## **Step 3: Perform GWAS (PSAs)**
-To initiate this step, PSAs should have received the approval from CCAG. Additionally, they must have prepared the genotype and imputed data for *REGENIE* steps 1 and 2 following the instructions provided in the Analysis Plan.
+## **Step 3: Perform GWAS (SAs)**
+To initiate this step, SAs should have received the approval from CA. Additionally, they must have prepared the genotype and imputed data for *REGENIE* steps 1 and 2 following the instructions provided in the Analysis Plan.
 
-Every available script will be executed by PSAs on a Linux server using the *bash* command line.
+Every available script will be executed by SAs on a Linux server using the *bash* command line.
 
 A) **Create job files**.
-Same scripts that were previously run in **Step 1: Phenotype preparation (PSAs)** will be employed again, but this time using the *jobs* mode, instead the *pheno* mode.The process will generate two files: one containing the phenotypes and covariates details, and the other holding the command lines. Both files are required for creating the different job files.
-Keep in mind that CCAG should prompt PSAs (e.g.,in the Analysis Plan) to adjust the paths in where genotypic and imputed data are found in the *make-regenie-step1-job-scripts.sh* and *make-regenie-step2-job-scripts.sh*,respectively.
-Here, one job will be crated for each phenotype for REGENIE step 1, and one job for each phenotype and chromosome for REGENIEs step 2.
+Same scripts that were previously run in **Step 1: Phenotype preparation (SAs)** will be employed again, but this time using the *jobs* mode, instead the *pheno* mode.The process will generate two files: one containing the phenotypes and covariates details, and the other holding the command lines. Both files are required for creating the different job files.
+Keep in mind that CA should prompt SAs (e.g.,in the Analysis Plan) to adjust the paths in where genotypic and imputed data are found in the *make-regenie-step1-job-scripts.sh* and *make-regenie-step2-job-scripts.sh*,respectively.
+Here, one job will be created for each phenotype for REGENIE step 1, and one job for each phenotype and chromosome for REGENIEs step 2.
+These scripts are set up to utilize a Slurm job scheduler and will need to be adapted to the server infrastructure of participating studies.
+
 
 B) **Run GWAS using *REGENIE* **.
-PSAs will executed a shell script (*03-submit-all-jobs.sh*) to submit all GWAS according to the jobs generated in the preceding step for both steps 1 and 2 of REGENIE.
+SAs will executed a shell script (*03-submit-all-jobs.sh*) to submit all GWAS according to the jobs generated in the preceding step for both steps 1 and 2 of REGENIE.
 
 
 C) **Create Summary Statistics** and **Collect & Upload results**.
-The PSAs will then run the *04-postprocess-results.sh* script, which investigate the different log files generated during REGENIE process to ensure the successful execution of each GWAS.It also produces tailored summary tables for each GWAS.  Finally, the results will be compiled into a compressed folder using *05-collect-files-for-upload.sh*,  which will then be submitted to the CCAG server for further validation.
+The SAs will then run the *04-postprocess-results.sh* script, which investigate the different log files generated during REGENIE process to ensure the successful execution of each GWAS.It also produces tailored summary tables for each GWAS.  Finally, the results will be compiled into a compressed folder using *05-collect-files-for-upload.sh*,  which will then be submitted to the CA server for further validation.
 
-Extended explanation regarding  **Step 3: Perform GWAS (PSAs)** can be found in the [Analysis Plan](TOADD) example.
+Extended explanation regarding  **Step 3: Perform GWAS (SAs)** can be found in the [Analysis Plan](TOADD) example.
 
 
-## **Step 4: Participant-study GWAS-QC (CCAG)**
-The compressed folder submitted by the PSA, will be stored in the *upload/assoc* directory, within the folder corresponding to the specific participating study.
+## **Step 4: Participant-study GWAS-QC (CA)**
+The compressed folder submitted by the SA, will be stored in the *upload/assoc* directory, within the folder corresponding to the specific participating study.
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/uploads/assoc/Specific_study_name"
 ```
 
-CCAG will then proceed to unzip the folder.
+CA will then proceed to unzip the folder.
 
 
 #### *Folder.config.sh* file
-It contains information about the  paths necessary to run GWAS-QC scripts. CCAG should adjusted these paths and can also add important settings to align with specific requirements, such as server specifications. To make the  **Step 4: Participant-study GWAS-QC (CCAG)** universal, their different scripts, GWASConsortiumPrep-*gwas_qc* folder will call the *Folder.config.sh*. Therefore, there is no need to make modifications to any other scripts.
+It contains information about the  paths necessary to run GWAS-QC scripts. CA should adjusted these paths and can also add important settings to align with specific requirements, such as server specifications. To make the  **Step 4: Participant-study GWAS-QC (CA)** universal, their different scripts, GWASConsortiumPrep-*gwas_qc* folder will call the *Folder.config.sh*. Therefore, there is no need to make modifications to any other scripts.
 
 Reminder: Ensure that all the mentioned scripts (GWASConsortiumPrep_*gwas_qc* folder), are stored, in the same format GWASConsortiumPrep provided, within the *"script"* folder of the consortium directory.
 
@@ -172,10 +173,10 @@ Reminder: Ensure that all the mentioned scripts (GWASConsortiumPrep_*gwas_qc* fo
 ```
 
  
-After making the necessary adjustments to the *Folder.config.sh* file, CCAG is prepared to carry out the subsequent substeps:
+After making the necessary adjustments to the *Folder.config.sh* file, CA is prepared to carry out the subsequent substeps:
 
 A) **Combine chromosomes**.
-CCAG will run *01_combine_chromosomes.sh* script. First, it will check if any file are missing by checking the existing files in regenie step 1 output (one file for each phenotype) and step 2 output (one file for each phenotype chromosome). Upon successful completion of the verification process, all chromosomes will be consolidated into a unified file for each trait.
+CA will run *01_combine_chromosomes.sh* script. First, it will check if any file are missing by checking the existing files in regenie step 1 output (one file for each phenotype) and step 2 output (one file for each phenotype chromosome). Upon successful completion of the verification process, all chromosomes will be consolidated into a unified file for each trait.
 
 Command line to run this step:
 
@@ -197,10 +198,10 @@ D) **QC stats**
 
 E) **Other recommended sub-steps**
 
-## **Step 5: Auto GWAS_QC multistudies (CCAG)**
-By combining the summary statistics from GWAS-QC (*qc-stats.csv*) and the results of positive controls analysis (*positive-controls.csv*) across all participating studies, CCAG will perform a final checking process. A set of relevant items will be checked, including:  wrong genomic build, allele switches and swaps, missing data, file and number formatting issues, unaccounted inflation, and wrong transformations, among others.
+## **Step 5: Auto GWAS_QC multistudies (CA)**
+By combining the summary statistics from GWAS-QC (*qc-stats.csv*) and the results of positive controls analysis (*positive-controls.csv*) across all participating studies, CA will perform a final checking process. A set of relevant items will be checked, including:  wrong genomic build, allele switches and swaps, missing data, file and number formatting issues, unaccounted inflation, and wrong transformations, among others.
 
-GWASConsortiumPrep provides a script (*GWAS_QC_multistudies.R*), which automatically evaluates the list of potential problems, mentioned above. For its execution, CCAG will require the previously created **Consortium-specifics.R** plug-in, which supplies a tolerance table, establishing the thresholds to apply at each verification stage based on the different phenotypes and covariates to be tested. In the end, a conclusive-summary table will be generated, indicating whether each trait for each assessed item is categorized as "OKAY" or "NOT OKAY". CCAG should scan all entries and emphasizing those labeled as  "NOT OKAY", as  well as,  plots produced in the **Step 4: Participant-study GWAS-QC (CCAG)**. If an explanation for any identified issues cannot be determined, CCAG must reach out to the PSA to collaboratively work towards a resolution.
+GWASConsortiumPrep provides a script (*GWAS_QC_multistudies.R*), which automatically evaluates the list of potential problems, mentioned above. For its execution, CA will require the previously created **Consortium-specifics.R** plug-in, which supplies a tolerance table, establishing the thresholds to apply at each verification stage based on the different phenotypes and covariates to be tested. In the end, a conclusive-summary table will be generated, indicating whether each trait for each assessed item is categorized as "OKAY" or "NOT OKAY". CA should scan all entries and emphasizing those labeled as  "NOT OKAY", as  well as,  plots produced in the **Step 4: Participant-study GWAS-QC (CA)**. If an explanation for any identified issues cannot be determined, CA must reach out to the SA to collaboratively work towards a resolution.
 
 
 ---
