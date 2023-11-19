@@ -6,14 +6,16 @@
 # it uses bgzip and tabix on the file(s)
 
 STUDY_ID=$1
+if [ "$STUDY_ID" == "" ]
+then
+	echo "Give study cleaning dir name as first argument."
+	exit 3
+fi
 
-source ./folders.config.sh $STUDY_ID
+source ./folders.config.sh
 
-echo "GWAS_UPLOAD_DIR: $GWAS_UPLOAD_DIR"
-echo "CLEANING_DIR: $CLEANING_DIR"
-
-IN_PATH=${GWAS_UPLOAD_DIR}/output_regenie_step2 
-OUT_PATH=${CLEANING_DIR}/data
+IN_PATH=${GWAS_UPLOAD_DIR}/$STUDY_ID/output_regenie_step2 
+OUT_PATH=${CLEANING_DIR}/$STUDY_ID/data
 
 if [ ! -d "$IN_PATH" ]
 then

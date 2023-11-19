@@ -1,16 +1,18 @@
-SCRIPT_DIR="/storage/scripts/ckdgenR5/gwas_qc"
+source ./folders.config.sh
 
-mkdir -p /storage/cleaning/ckdgenR5/00_SUMMARY
-STATS=/storage/cleaning/ckdgenR5/00_SUMMARY/qc-stats.csv
-STATSXLSX=/storage/cleaning/ckdgenR5/00_SUMMARY/qc-stats.xlsx
+SCRIPT_DIR=$SCRIPTS_DIR
+
+mkdir -p ${PREFIX}/00_SUMMARY
+STATS=${PREFIX}/00_SUMMARY/qc-stats.csv
+STATSXLSX=${PREFIX}/00_SUMMARY/qc-stats.xlsx
 MYDATE=`date --iso-8601`
-mv -v $STATS /storage/cleaning/ckdgenR5/00_SUMMARY/Archive/qc-stats-${MYDATE}.csv
+mv -v $STATS ${PREFIX}/00_SUMMARY/Archive/qc-stats-${MYDATE}.csv
 
-POSCTRL=/storage/cleaning/ckdgenR5/00_SUMMARY/positive-controls.csv
-POSCTRLXLSX=/storage/cleaning/ckdgenR5/00_SUMMARY/positive-controls.xlsx
+POSCTRL=${PREFIX}/00_SUMMARY/positive-controls.csv
+POSCTRLXLSX=${PREFIX}/00_SUMMARY/positive-controls.xlsx
 rm -f $POSCTRL
 
-for STUDY in `ls -d /storage/cleaning/ckdgenR5/*`
+for STUDY in `ls -d ${PREFIX}/*`
 do
 	FN=`basename $STUDY`
 	if [ "$FN" == "00_SUMMARY" -o "$FN" == "00_ARCHIVE" ]
@@ -61,7 +63,7 @@ do
 		echo " - WARNING: positive control file not found: $POSCTRL_FN"
 	fi
 
-done
+done >> 04-collect-qc-stats.log
 
 Rscript $SCRIPT_DIR/ConvertQcStatsToXlsx.R $STATS $STATSXLSX
 Rscript $SCRIPT_DIR/ConvertPosCtrlToXlsx.R $POSCTRL $POSCTRLXLSX

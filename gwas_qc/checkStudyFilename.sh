@@ -1,5 +1,11 @@
 #!/bin/bash
 
+source ./folders.config.sh
+
+PHENOS=$PHENOTYPES
+STRAT=$STRATA
+ANC=$ANCESTRY
+
 FN=$(basename $1)
 FN_NO_SUFFIX=$(echo $FN | sed s/.gwas.gz//)
 
@@ -12,7 +18,7 @@ fi
 
 echo "FN without suffix: $FN_NO_SUFFIX"
 
-for STRATUM in binary_overall_ quantitative_overall_ quantitative_sex_stratified_
+for STRATUM in $STRAT
 do
 	if [[ "$FN_NO_SUFFIX" = *${STRATUM}* ]]
 	then
@@ -29,7 +35,7 @@ fi
 
 echo "FN without stratum: $FN_NO_STRATUM"
 
-for PHENO in _ckd _ma _gout _albumin_serum_int _egfr_creat_int _egfr_cys_int _uacr_int _urate_serum_int _calcium_serum_int _phosphate_serum_int _egfr_creat_male _egfr_creat_female _egfr_cys_male _egfr_cys_female _uacr_ln_male _uacr_ln_female _urate_serum_male _urate_serum_female
+for PHENO in $PHENOS
 do
 	if [[ "$FN_NO_SUFFIX" == *${PHENO} ]]
 	then
@@ -46,7 +52,7 @@ fi
 
 echo "FN without phenotype: $FN_NO_PHENO"
 
-for ANCESTRY in EUR_ EAS_ SAS_ AFR_ AMR_ HIS_ MID_
+for ANCESTRY in $ANC
 do
 	if [[ "$FN_NO_PHENO" == *${ANCESTRY}* ]]
 	then
@@ -62,7 +68,6 @@ then
 fi
 
 echo "FN without ancestry: $FN_NO_ANCESTRY"
-#SHIP_T_B2_TopMed_20220808_5
 
 UNDERSCORE_COUNT=$(echo "$FN_NO_ANCESTRY" | tr -cd '_' | wc -c)
 echo "Underscore count: $UNDERSCORE_COUNT"

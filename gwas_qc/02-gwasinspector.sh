@@ -8,12 +8,11 @@ then
 	exit 3
 fi
 
-source ./folders.config.sh $STUDY_NAME
+source ./folders.config.sh
 
 #IMAGE=/home/mwuttke/SingularityTest/gwasinspector.simg
-MYDIR=$GWAS_UPLOAD_DIR
-
-echo $MYDIR
+MYDIR=${GWAS_UPLOAD_DIR}/${STUDY_NAME}
+CLEAN_DIR=${CLEANING_DIR}/${STUDY_NAME}
 
 if [ ! -d "$MYDIR" ]
 then
@@ -24,10 +23,10 @@ fi
 if [ ! -f "$MYDIR/config.ini" ]
 then
 	echo "config.ini not found: Creating one."
-	cat ${SCRIPTS_DIR}/GWASinspector/config.ini.template | sed -e "s/CLEANING_DIR/$(echo $CLEANING_DIR | sed 's/\//\\\//g')/g" -e "s/REF_DIR/$(echo $REF_DIR | sed 's/\//\\\//g')/g" > $MYDIR/config.ini
+	cat ${SCRIPTS_DIR}/GWASinspector/config.ini.template | sed -e "s/CLEAN_DIR/$(echo $CLEAN_DIR | sed 's/\//\\\//g')/g" -e "s/REF_DIR/$(echo $REF_DIR | sed 's/\//\\\//g')/g" > $MYDIR/config.ini
 fi
 
-mkdir -p ${CLEANING_DIR}/qc-output
+mkdir -p ${CLEAN_DIR}/qc-output
 
 echo "Run singularity GWASinspector"
 #singularity exec \

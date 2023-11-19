@@ -1,6 +1,8 @@
-SCRIPT_DIR="/storage/scripts/ckdgenR5/gwas_qc"
+source ./folders.config.sh
 
-for STUDY in `ls -d /storage/cleaning/ckdgenR5/*`
+SCRIPT_DIR=$SCRIPTS_DIR
+
+for STUDY in `ls -d ${PREFIX}/*`
 do
 	FN=`basename $STUDY`
 	if [ "$FN" == "00_SUMMARY" -o "$FN" == "00_ARCHIVE" ]
@@ -12,7 +14,7 @@ do
 	echo "Study: $FN"
 	echo "========================="
 
-	FREQ_PREFIX=/storage/cleaning/ckdgenR5/$FN/freqs
+	FREQ_PREFIX=${PREFIX}/$FN/freqs
 	mkdir -p $FREQ_PREFIX
 
 	for STUDY_FILE in `ls $STUDY/data/*.gz`
@@ -21,15 +23,15 @@ do
 		#echo "File: $STUDY_FILE"
 		POP=`$SCRIPT_DIR/find-population.sh $STUDY_FILE`
 
-		SIMPLER_NAME=$(basename $STUDY_FILE | sed s/_quantitative// | sed s/_overall// | sed s/_binary// | sed s/_sex_stratified// | sed s/.gwas.gz//)
+		SIMPLER_NAME=$(basename $STUDY_FILE | sed s/_quantitative// | sed s/_overall// | sed s/_binary// | sed s/_sex_stratified// | sed s/.gwas.gz//) #Remove overall and sextratified?
 		echo " - title: $SIMPLER_NAME, pop: $POP"
 
 		FREQ_OUT=$FREQ_PREFIX/${SIMPLER_NAME}.freq.gz
 		if [ ! -f $FREQ_OUT ]
 		then
 			echo "Merging frequencies to: $FREQ_OUT"
-			REFPANEL_FILE=/storage/databases/1kgp/1kgp_frequencies_b38.txt.gz
-			/storage/scripts/ckdgenR5/gwas_qc/Frequency_Comparison/join_frequency_files.py $STUDY_FILE $REFPANEL_FILE $FREQ_OUT $POP | tee $FREQ_PREFIX/${SIMPLER_NAME}.freq.log
+			REFPANEL_FILE=${REF_DIR}/1kgp/1kgp_frequencies_b38.txt.gz
+			 ${SCRIPTS_DIR}/Frequency_Comparison/join_frequency_files.py $STUDY_FILE $REFPANEL_FILE $FREQ_OUT $POP | tee $FREQ_PREFIX/${SIMPLER_NAME}.freq.log
 			RC="$?"
 			if [ "$RC" -ne 0 ]
 			then
@@ -41,7 +43,7 @@ do
 		PLOT_OUT=$FREQ_PREFIX/${SIMPLER_NAME}.freqPlot.pdf
 		if [ ! -f $PLOT_OUT ]
 		then
-			PLOT_SCRIPT=/storage/scripts/ckdgenR5/gwas_qc/Frequency_Comparison/plot.R
+			PLOT_SCRIPT=${SCRIPTS_DIR}/Frequency_Comparison/plot.R
 			Rscript $PLOT_SCRIPT $FREQ_OUT $SIMPLER_NAME $PLOT_OUT
 		fi
 	done

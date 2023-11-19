@@ -1,12 +1,15 @@
 library(ggplot2)
 
-data = read.csv("/storage/cleaning/ckdgenR5/00_SUMMARY/qc-stats.csv")
+infn <- commandArgs(trailingOnly = TRUE)[1]
+outfn <- commandArgs(trailingOnly = TRUE)[2]
+
+data = read.csv(infn)
 
 
 for (pheno in unique(data$PHENO)) {
   print(pheno)
   my_width <- sum(data$PHENO == pheno,na.rm=TRUE)/1.5 # fine tune factor
-  pdf(paste0("/storage/cleaning/ckdgenR5/00_SUMMARY/plots/Assoc-QC-", pheno, "-plots.pdf"),width=my_width)
+  pdf(paste0(outfn,"/Assoc-QC-", pheno, "-plots.pdf"),width=my_width)
   pheno_data = data[data$PHENO == pheno,]
   
   for (var in c("PVALUE", "BETA", "STDERR", "IMP_QUALITY", "EFF_ALL_FREQ")) {

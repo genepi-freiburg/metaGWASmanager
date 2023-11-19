@@ -1,5 +1,5 @@
-gsheet_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQjwLVm9EI9mpOOIyt3zdSH9l5_nyjckvtnZBtASFdw-fToluOPIU-CEIWw_xdeqdd7ry2SbLzPd-Zx/pub?output=csv"
-qc_stats_file = "/storage/cleaning/ckdgenR5/00_SUMMARY/qc-stats.csv"
+gsheet_url<-commandArgs(trailingOnly = TRUE)[1]
+qc_stats_file<- commandArgs(trailingOnly = TRUE)[2]
 
 
 data = read.csv(gsheet_url)
