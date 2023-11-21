@@ -2,9 +2,13 @@
 
 source ./folders.config.sh
 
-PHENOS=$PHENOTYPES
-STRAT=$STRATA
-ANC=$ANCESTRY
+PHENOS==$(echo "$PHENOTYPES" | sed 's/\<\([^ ]*\)/_\1/g')
+STRAT=$(echo $STRATA | sed 's/ /_ /g')
+STRAT="${STRAT}_"
+
+ANC=$(echo $ANCESTRY | sed 's/ /_ /g')
+ANC="${ANC}_"
+
 
 FN=$(basename $1)
 FN_NO_SUFFIX=$(echo $FN | sed s/.gwas.gz//)

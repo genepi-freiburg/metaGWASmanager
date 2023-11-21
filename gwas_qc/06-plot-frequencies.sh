@@ -1,7 +1,5 @@
 source ./folders.config.sh
 
-SCRIPT_DIR=$SCRIPTS_DIR
-
 for STUDY in `ls -d ${PREFIX}/*`
 do
 	FN=`basename $STUDY`
@@ -19,12 +17,9 @@ do
 
 	for STUDY_FILE in `ls $STUDY/data/*.gz`
 	do
-		#gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas.gz
-		#echo "File: $STUDY_FILE"
-		POP=`$SCRIPT_DIR/find-population.sh $STUDY_FILE`
+		POP=`$SCRIPTS_DIR/find-population.sh $STUDY_FILE`
 
-		SIMPLER_NAME=$(basename $STUDY_FILE | sed s/_quantitative// | sed s/_overall// | sed s/_binary// | sed s/_sex_stratified// | sed s/.gwas.gz//) #Remove overall and sextratified?
-		echo " - title: $SIMPLER_NAME, pop: $POP"
+		SIMPLER_NAME=$(basename $STUDY_FILE | sed s/_quantitative// | sed s/_binary// | sed s/.gwas.gz//) 
 
 		FREQ_OUT=$FREQ_PREFIX/${SIMPLER_NAME}.freq.gz
 		if [ ! -f $FREQ_OUT ]

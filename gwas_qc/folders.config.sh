@@ -1,28 +1,38 @@
 #!/bin/bash
 
-# this script combines REGENIE step 2 outputs per phenotype
-# it has some logic to determine the phenotype name from the filename,
-# it adds a PVAL column as 10^-LOG10P,
-# it uses bgzip and tabix on the file(s)
+#Adjusted the script according your requirements
 
-#If it is necesary
-#module load snippy/4.4.1-foss-2018b-Perl-5.28.0
-#module load HTSlib/1.15.1-GCC-11.3.0
-#module load R/4.1.0-foss-2021a
-#module load FlexiBLAS/3.2.0-GCC-11.3.0
-
-
+#Add path where you are working on
 export PREFIX=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline_core
+
+#Add path to scripts directory
 export SCRIPTS_DIR=$PREFIX/scripts/gwas_qc
+
+#Add path to phenotype folder in upload directory
 export PHENO_UPLOAD_DIR=$PREFIX/uploads/pheno
+
+#Add path to associations folder in upload directory
 export GWAS_UPLOAD_DIR=$PREFIX/uploads/assoc
+
+#Add path to cleaning directory
 export CLEANING_DIR=$PREFIX/cleaning
+
+#Add path to downloaded databases
 export REF_DIR=$PREFIX/databases
+
+#Add path to your google sheet
 export URL_GSHEET=https://docs.google.com/spreadsheets/d/e/2PACX-1vQjwLVm9EI9mpOOIyt3zdSH9l5_nyjckvtnZBtASFdw-fToluOPIU-CEIWw_xdeqdd7ry2SbLzPd-Zx/pub?output=csv
-export PHENOTYPES="_ckd _ma _gout _albumin_serum_int _egfr_creat_int _egfr_cys_int _uacr_int _urate_serum_int _calcium_serum_int _phosphate_serum_int _egfr_creat_male _egfr_creat_female _eg
-fr_cys_male _egfr_cys_female _uacr_ln_male _uacr_ln_female _urate_serum_male _urate_serum_female"
-export STRATA="binary_overall_ quantitative_overall_ quantitative_sex_stratified_"
-export ANCESTRY="EUR_ EAS_ SAS_ AFR_ AMR_ HIS_ MID_"
+
+#Add your phenotypes vector
+export PHENOTYPES="ckd ma gout albumin_serum_int egfr_creat_int egfr_cys_int uacr_int urate_serum_int calcium_serum_int phosphate_serum_int egfr_creat_male egfr_creat_female egfr_cys_male egfr_cys_female uacr_ln_male uacr_ln_female urate_serum_male urate_serum_female"
+
+#Add your type od data "_"
+export STRATA="binary_overall quantitative_overall quantitative_sex_stratified"
+#export STRATA="binary_overall_ quantitative_overall_ quantitative_sex_stratified_"
+
+#Add your specific ancestry vector
+export ANCESTRY="EUR EAS SAS AFR AMR HIS MID"
+#export ANCESTRY="EUR_ EAS_ SAS_ AFR_ AMR_ HIS_ MID_"
 
 
 echo "Done."

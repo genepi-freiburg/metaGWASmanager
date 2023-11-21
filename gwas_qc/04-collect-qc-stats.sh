@@ -1,7 +1,5 @@
 source ./folders.config.sh
 
-SCRIPT_DIR=$SCRIPTS_DIR
-
 mkdir -p ${PREFIX}/00_SUMMARY
 STATS=${PREFIX}/00_SUMMARY/qc-stats.csv
 STATSXLSX=${PREFIX}/00_SUMMARY/qc-stats.xlsx
@@ -30,10 +28,10 @@ do
 	for STUDY_FILE in `ls $STUDY/qc-output/*.rds`
 	do
 		#echo "File: $STUDY_FILE"
-		PHENO=`$SCRIPT_DIR/find-main-pheno.sh $STUDY_FILE`
-		POP=`$SCRIPT_DIR/find-population.sh $STUDY_FILE`
+		PHENO=`$SCRIPTS_DIR/find-main-pheno.sh $STUDY_FILE`
+		POP=`$SCRIPTS_DIR/find-population.sh $STUDY_FILE`
 		echo " - Pheno: $PHENO, Pop: $POP"
-		Rscript ${SCRIPT_DIR}/04-collect-qc-stats-for-file.R $STUDY_FILE $FN $PHENO $POP $OFN
+		Rscript ${SCRIPTS_DIR}/04-collect-qc-stats-for-file.R $STUDY_FILE $FN $PHENO $POP $OFN
 		RC="$?"
 		if [ "$RC" -ne 0 ]
 		then
@@ -65,5 +63,5 @@ do
 
 done >> 04-collect-qc-stats.log
 
-Rscript $SCRIPT_DIR/ConvertQcStatsToXlsx.R $STATS $STATSXLSX
-Rscript $SCRIPT_DIR/ConvertPosCtrlToXlsx.R $POSCTRL $POSCTRLXLSX
+Rscript $SCRIPTS_DIR/ConvertQcStatsToXlsx.R $STATS $STATSXLSX
+Rscript $SCRIPTS_DIR/ConvertPosCtrlToXlsx.R $POSCTRL $POSCTRLXLSX

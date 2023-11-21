@@ -1,14 +1,9 @@
 #!/bin/bash
 
-# this script combines REGENIE step 2 outputs per phenotype
-# it has some logic to determine the phenotype name from the filename,
-# it adds a PVAL column as 10^-LOG10P,
-# it uses bgzip and tabix on the file(s)
-
 STUDY_ID=$1
 if [ "$STUDY_ID" == "" ]
 then
-	echo "Give study cleaning dir name as first argument."
+	echo "Please, give study cleaning ID name as first argument."
 	exit 3
 fi
 

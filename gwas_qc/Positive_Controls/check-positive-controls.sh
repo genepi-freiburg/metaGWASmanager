@@ -4,14 +4,14 @@ SCRIPT_DIR= ${SCRIPTS_DIR}/Positive_Controls
 STUDY_DIR=$1
 if [ ! -d "$1" ]
 then
-	echo "ERROR: please give directory with result files as first argument"
+	echo "ERROR: Please give directory with result files as first argument"
 	exit 3
 fi
 
 OUT_FN=$2
 if [ "$2" == "" ]
 then
-	echo "ERROR: please give output CSV file name as second argument"
+	echo "ERROR: Please give output CSV file name as second argument"
 	exit 3
 fi
 

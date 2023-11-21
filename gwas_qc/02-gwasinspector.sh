@@ -1,18 +1,18 @@
 
 #!/bin/bash
 
-STUDY_NAME=$1
-if [ "$STUDY_NAME" == "" ]
+STUDY_ID=$1
+if [ "$STUDY_ID" == "" ]
 then
-	echo "Give study cleaning dir name as first argument."
+	echo "Please, give study cleaning ID name as first argument."
 	exit 3
 fi
 
 source ./folders.config.sh
 
 #IMAGE=/home/mwuttke/SingularityTest/gwasinspector.simg
-MYDIR=${GWAS_UPLOAD_DIR}/${STUDY_NAME}
-CLEAN_DIR=${CLEANING_DIR}/${STUDY_NAME}
+MYDIR=${GWAS_UPLOAD_DIR}/${STUDY_ID}
+CLEAN_DIR=${CLEANING_DIR}/${STUDY_ID}
 
 if [ ! -d "$MYDIR" ]
 then

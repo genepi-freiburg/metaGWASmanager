@@ -6,15 +6,6 @@ pheno = args[3]
 pop = args[4]
 out = args[5]
 
-# pheno is too "rough"
-# /storage/cleaning/ckdgenR5/SHIP_0-2022-10-24/qc-output/QC_SHIP_0_R4c_EUR_TopMed_20220725_quantitative_sex_stratified_18_urate_serum_female.gwas_object.rds
-# /storage/cleaning/ckdgenR5/FHS_EUR_2022-11-17/qc-output/QC_FHS_EUR_TopMed_20221118_quantitative_overall_calcium_serum_int.gwas_object.rds
-pheno = gsub(".*_\\d?\\d_(.*)\\.gwas_object\\.rds", "\\1", fn)
-
-# fix bad file names (w/o these numbers)
-pheno = gsub(".*overall_(.*)\\.gwas_object\\.rds", "\\1", pheno)
-pheno = gsub(".*stratified_(.*)\\.gwas_object\\.rds", "\\1", pheno)
-
 
 cat(paste0("Process: ", fn, ", study: ", study, ", pheno: ", pheno, ", pop: ", pop, ", out: ", out, "\n"))
 
