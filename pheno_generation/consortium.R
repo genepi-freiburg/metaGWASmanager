@@ -730,22 +730,37 @@ for (pheno in phenos) {
   print(paste0("== RUN ", run_idx, ": ", type))
   print(paste0("Phenotype: ", pheno))
   print(paste0("Quantitative covariates: ", paste(quant_covars, collapse=", ")))
-  print(paste0("Categorical covariates: ", paste(cat_covars, collapse=", ")))
-  
-  for (step in c("step1", "step2")) {  
-    cat(paste0("./make-regenie-", step, "-job-scripts.sh ",
-               parameters_list$study_name, " ",
-               parameters_list$ancestry, " ",
-               parameters_list$refpanel, " ",
-               parameters_list$analysis_date, " ",
-               type, " ",
-               pheno, " '",
-               paste(quant_covars, collapse=","), "' '",
-               paste(cat_covars, collapse=","), "' ",
-               run_idx, "\n"),
-        append = T, file = script_fn)
+  if(!is.na(cat_covars)) {
+    print(paste0("Categorical covariates: ", paste(cat_covars, collapse=", ")))
   }
-  
+
+  for (step in c("step1", "step2")) {  
+    if(is.na(cat_covars)){
+      cat(paste0("./make-regenie-", step, "-job-scripts.sh ",
+                 name, " ",
+                 study, " ",
+                 ref_panel, " ", 
+                 date, " ",
+                 type, " ",
+                 pheno, " '",
+                 quant_covars, "' '",
+                 "' ",
+                 run_idx, "\n"),
+          append = T, file = script_fn)
+    } else {
+      cat(paste0("./make-regenie-", step, "-job-scripts.sh ",
+                 name, " ",
+                 study, " ",
+                 ref_panel, " ", 
+                 date, " ",
+                 type, " ",
+                 pheno, " '",
+                 quant_covars, "' '",
+                 cat_covars, "' ",
+                 run_idx, "\n"),
+          append = T, file = script_fn)
+    }
+  }
 }
 
 if (run_idx == 0) {

@@ -410,7 +410,17 @@ determine_phenotypes_covariables <- function() {
   colnames(data_frame) <- c("Type" ,"Phenotypes", "Quant_covar", "Cat_covar")
   
    #Be careful with  stratification (omit sex and smk variable in sex_stratified and Smk_stratified, respectively)
-  data_frame$Cat_covar<- ifelse(grepl("_male$", data_frame$Phenotypes) | grepl("_female$", data_frame$Phenotypes), gsub("sex,", "", data_frame$Cat_covar),data_frame$Cat_covar)
+  for (i in 1:nrow(data_frame)) {
+    if (grepl(",", data_frame$Cat_covar[i])) {
+      if (grepl("_male$|_female$", data_frame$Phenotypes[i])) {
+        data_frame$Cat_covar[i] <- gsub("sex,", "", data_frame$Cat_covar[i])
+      }
+    } else {
+      if (grepl("_male$|_female$", data_frame$Phenotypes[i])) {
+        data_frame$Cat_covar[i] <- NA
+      }
+    }
+  }
   data_frame$Cat_covar<- ifelse(grepl("_neversmk$", data_frame$Phenotypes), "sex",data_frame$Cat_covar)
   
   return(data_frame)

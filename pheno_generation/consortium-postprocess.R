@@ -233,7 +233,11 @@ summarize_all_phenotypes = function(all_summary_statistics, pheno_data, pheno) {
   vars.c<- c(trimws(unlist(strsplit(summary_all$Cat_covar[summary_all$Phenotypes == pheno], ","))))
   
   #All types of variables
-  vars<- c(vars.q, vars.c)
+  if(!is.na(vars.c)){
+    vars<- c(vars.q, vars.c)
+  } else {
+    vars<- c(vars.q)
+  }
   names(vars)<- pheno
   
   #Apply function "summarize_all_variable" for each variable present in the "vars" vector. 
