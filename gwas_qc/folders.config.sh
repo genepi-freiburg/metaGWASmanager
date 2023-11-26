@@ -26,14 +26,11 @@ export URL_GSHEET=https://docs.google.com/spreadsheets/d/e/2PACX-1vQjwLVm9EI9mpO
 #Add your phenotypes vector
 export PHENOTYPES="ckd ma gout albumin_serum_int egfr_creat_int egfr_cys_int uacr_int urate_serum_int calcium_serum_int phosphate_serum_int egfr_creat_male egfr_creat_female egfr_cys_male egfr_cys_female uacr_ln_male uacr_ln_female urate_serum_male urate_serum_female"
 
-#Add your type od data "_"
+#Add your type of data vector
 export STRATA="binary_overall quantitative_overall quantitative_sex_stratified"
-#export STRATA="binary_overall_ quantitative_overall_ quantitative_sex_stratified_"
 
 #Add your specific ancestry vector
 export ANCESTRY="EUR EAS SAS AFR AMR HIS MID"
-#export ANCESTRY="EUR_ EAS_ SAS_ AFR_ AMR_ HIS_ MID_"
-
 
 echo "Done."
 
