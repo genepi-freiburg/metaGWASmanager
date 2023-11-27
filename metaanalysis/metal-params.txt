@@ -1,0 +1,51 @@
+# column names
+MARKER   MARKER
+WEIGHT   n_total
+ALLELE   coded_all noncoded_all
+FREQ     AF_coded_all
+EFFECT   beta
+STDERR   SE
+PVAL     pval
+
+# average frequencies
+AVERAGEFREQ ON
+
+# give min/max frequency
+MINMAXFREQ ON
+
+# perform fixed-effects inverse variance-weighted metaanalysis
+SCHEME STDERR
+
+# perform GC on input files (calculates lambda)
+GENOMICCONTROL ON
+
+# these filters should not match
+ADDFILTER SE > 0
+ADDFILTER pval < 1
+ADDFILTER pval > 0
+#ADDFILTER chr < 23
+ADDFILTER AF_coded_all > 0
+ADDFILTER AF_coded_all < 1
+
+# !!!! maybe tweak this filter
+#ADDFILTER mac > 10
+
+# custom (sum) variables
+CUSTOMVARIABLE n_total_sum
+CUSTOMVARIABLE n_effective_sum
+CUSTOMVARIABLE mac_sum
+CUSTOMVARIABLE oevar_imp_sum
+
+# novel precision flag
+EFFECTPRECISION 8
+STDERRPRECISION 8
+
+# labels for the variables (determine columns which are summed)
+LABEL n_total_sum AS n_total
+LABEL n_effective_sum AS n_effective
+LABEL mac_sum AS mac
+LABEL oevar_imp_sum AS oevar_imp
+
+# output file name
+OUTFILE output/%ANALYSISNAME% .tbl
+
