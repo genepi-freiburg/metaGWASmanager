@@ -4,16 +4,14 @@
 ########                                                                            ########
 ############################################################################################
 
+args = commandArgs(trailingOnly = T)
 #PATHS
-setwd("Z:/ftp/zrodriguez/proyectos/CKD/Quality_control")
-qc_stats_file<- "data/new/qc-stats.csv"
-positive_controls_file<- "data/new/positive-controls.csv"
-source("consortium-specifics.R")
+qc_stats_file= args[1]
+positive_controls_file= args[2]
+plug_in= args[3]
+folder= args[4]
 
-folder <- "CKDGen_GWAS-QC_results/"  
-if( !file.exists( folder ) ) {
-  dir.create( file.path( folder ) )
-}
+source(paste0(plug_in))
 
 ## LIBRARIES
 library(data.table)
@@ -21,6 +19,7 @@ library(data.table)
 
 ##Get QC table thresholds
 tolerance_table<- get_QC_tolerance()
+print(tolerance_table)
 
 ############################################################################################################
 #   STEP 1.  Read qc-stats.cvs file
@@ -240,7 +239,7 @@ print(stop- start)
 res_final<-do.call("rbind",res_sub); print(dim(res_final)) #413   7
 res_final <- as.data.frame(res_final, row.names = F)
 names(res_final) <- c("study", "pheno", "pop", "pval","lambda", "effect_afreq", "impqual", "beta","stderr", "allel_freq", "vars.per.chr", "positive_control") 
-write.csv(res_final,  paste0(folder,"QC_", get_consortium_name (), ".csv"), row.names = F)
+write.csv(res_final,  paste0(folder,"/Auto_QC_", get_consortium_name (), ".csv"), row.names = F)
 
 
 

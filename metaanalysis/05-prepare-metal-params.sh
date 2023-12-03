@@ -1,35 +1,57 @@
-SCRIPTS_DIR=/storage/scripts/ckdgenR5/metaanalysis
-QUAL=$1
-WD=`pwd`
+source ../gwas_qc/folders.config.sh
 
-MYFILE=metal-params.txt
+Phenotype=$1
+
+if [ "$Phenotype" == "" ]
+then
+	echo "Please, give a phenotype name as first argument."
+	exit 3
+fi
+
+
+QUAL=$2
+
+if [ "$QUAL" == "" ]
+then
+	echo "Please, give a name of MAF threshold as second argument (e.g., HQ_All)"
+	exit 3
+fi
+
+MA_P_DIR=${PREFIX}/metaanalysis/$Phenotype
+MA_PQUAL_DIR=${MA_P_DIR}/$QUAL
+
+
+MYFILE=${MA_PQUAL_DIR}/metal-params.txt
+
+
 if [ -f $MYFILE ]
 then
 	echo "Metal parameters already exist: $MYFILE"
 	exit 3
 fi
 
-MYFILE1=*.metalparams
+MYFILE1=${MA_PQUAL_DIR}/*.metalparams
 if [ -f $MYFILE1 ]
 then
         echo "*.metalparams already exist: $MYFILE"
         exit 3
 fi
 
-ANALYSISNAME=$(basename `pwd`)
+ANALYSISNAME=$Phenotype
+OUTPUT=${MA_PQUAL_DIR}/metal_output_$QUAL/output
 echo "Analysis name: $ANALYSISNAME"
 
 
-cat $SCRIPTS_DIR/metal-params.txt |
-	sed s/%ANALYSISNAME%/$ANALYSISNAME/ > $MYFILE
+cat $SCRIPTS_MA/metal-params.txt |
+	sed -e "s#%ANALYSISNAME%#$ANALYSISNAME#" -e "s#%OUTPUT%#$OUTPUT#" > $MYFILE
 
-for FN in `cut -f7 -d "/" input-files-with-path.txt`
+for FN in `cut -f7 -d "/" $MA_P_DIR/input-files-with-path.txt`
 do
 
-	LC=$(zcat input_$QUAL/$FN | head -n 10 | wc -l)
+	LC=$(zcat $MA_PQUAL_DIR/input_$QUAL/$FN | head -n 10 | wc -l)
 	if [ "$LC" -gt 3 ]
 	then
-		echo "PROCESS input_$QUAL/$FN" >> $MYFILE
+		echo "PROCESS $MA_PQUAL_DIR/input_$QUAL/$FN" >> $MYFILE
 	else
 		echo "Skip (empty): $FN"
 	fi
@@ -39,12 +61,12 @@ echo >> $MYFILE
 echo "ANALYZE HETEROGENEITY" >> $MYFILE
 echo "QUIT" >> $MYFILE
 
-cp $MYFILE ${ANALYSISNAME}.$(date -Is).metalparams
+cp $MYFILE ${MA_PQUAL_DIR}/${ANALYSISNAME}.$(date -Is).metalparams
 
-mkdir -p metal_output_$1/output
+mkdir -p ${MA_PQUAL_DIR}/metal_output_$QUAL/output
 
-mv metal-params.txt metal_output_$1
-mv *.metalparams metal_output_$1
-ln -s $WD/input_$1 $WD/metal_output_$1
+mv ${MA_PQUAL_DIR}/metal-params.txt ${MA_PQUAL_DIR}/metal_output_$QUAL
+mv ${MA_PQUAL_DIR}/*.metalparams ${MA_PQUAL_DIR}/metal_output_$QUAL
+ln -s $MA_PQUAL_DIR/input_$QUAL/$FN $MA_PQUAL_DIR/metal_output_$QUAL
 
 echo "done"

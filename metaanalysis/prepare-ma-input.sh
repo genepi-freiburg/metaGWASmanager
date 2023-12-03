@@ -16,8 +16,6 @@ INDEL_REMOVAL=$7
 OUTDIR=$8
 SKIP_EXIST=$9
 
-SCRIPTS=/storage/scripts/ckdgenR5/metaanalysis
-
 if [ ! -f "$INPUT_FILE_LIST" ]
 then
 	echo "Input file list file does not exist: $INPUT_FILE_LIST"
@@ -83,7 +81,7 @@ else
 	echo "Parameters OK"
 fi
 
-FIND_COL="$SCRIPTS/find-column-index.pl"
+FIND_COL="${SCRIPTS_MA}/find-column-index.pl"
 
 for FN in `cat $INPUT_FILE_LIST`
 do

@@ -47,5 +47,5 @@ LABEL mac_sum AS mac
 LABEL oevar_imp_sum AS oevar_imp
 
 # output file name
-OUTFILE output/%ANALYSISNAME% .tbl
+OUTFILE %OUTPUT%/%ANALYSISNAME% .tbl
 

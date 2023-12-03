@@ -1,13 +1,13 @@
 source ./folders.config.sh
 
-mkdir -p ${PREFIX}/00_SUMMARY
-STATS=${PREFIX}/00_SUMMARY/qc-stats.csv
-STATSXLSX=${PREFIX}/00_SUMMARY/qc-stats.xlsx
+mkdir -p ${CLEANING_DIR}/00_SUMMARY
+STATS=${CLEANING_DIR}/00_SUMMARY/qc-stats.csv
+STATSXLSX=${CLEANING_DIR}/00_SUMMARY/qc-stats.xlsx
 MYDATE=`date --iso-8601`
-mv -v $STATS ${PREFIX}/00_SUMMARY/Archive/qc-stats-${MYDATE}.csv
+mv -v $STATS ${CLEANING_DIR}/00_SUMMARY/Archive/qc-stats-${MYDATE}.csv
 
-POSCTRL=${PREFIX}/00_SUMMARY/positive-controls.csv
-POSCTRLXLSX=${PREFIX}/00_SUMMARY/positive-controls.xlsx
+POSCTRL=${CLEANING_DIR}/00_SUMMARY/positive-controls.csv
+POSCTRLXLSX=${CLEANING_DIR}/00_SUMMARY/positive-controls.xlsx
 rm -f $POSCTRL
 
 for STUDY in `ls -d ${PREFIX}/*`
@@ -61,7 +61,7 @@ do
 		echo " - WARNING: positive control file not found: $POSCTRL_FN"
 	fi
 
-done >> 04-collect-qc-stats.log
+done >> ${CLEANING_DIR}/00_SUMMARY/04-collect-qc-stats.log
 
 Rscript $SCRIPTS_DIR/ConvertQcStatsToXlsx.R $STATS $STATSXLSX
 Rscript $SCRIPTS_DIR/ConvertPosCtrlToXlsx.R $POSCTRL $POSCTRLXLSX

@@ -21,7 +21,7 @@ export CLEANING_DIR=$PREFIX/cleaning
 export REF_DIR=$PREFIX/databases
 
 #Add path to your google sheet
-export URL_GSHEET=https://docs.google.com/spreadsheets/d/e/2PACX-1vQjwLVm9EI9mpOOIyt3zdSH9l5_nyjckvtnZBtASFdw-fToluOPIU-CEIWw_xdeqdd7ry2SbLzPd-Zx/pub?output=csv
+export URL_GSHEET=https://docs.google.com/spreadsheets/d/e/SH9l5_nyjckvtnZBtASFdw-fToluOPIU-CEIWw_xdeqdd7ry2SbLzPd-Zx/pub?output=csv
 
 #Add your phenotypes vector
 export PHENOTYPES="ckd ma gout albumin_serum_int egfr_creat_int egfr_cys_int uacr_int urate_serum_int calcium_serum_int phosphate_serum_int egfr_creat_male egfr_creat_female egfr_cys_male egfr_cys_female uacr_ln_male uacr_ln_female urate_serum_male urate_serum_female"
@@ -31,6 +31,9 @@ export STRATA="binary_overall quantitative_overall quantitative_sex_stratified"
 
 #Add your specific ancestry vector
 export ANCESTRY="EUR EAS SAS AFR AMR HIS MID"
+
+#Add to input file name needed for meta-analysisis
+export INPUT_MA_FILE=$PREFIX/metaanalysis/input-file-list.txt
 
 echo "Done."
 

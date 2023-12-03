@@ -1,6 +1,6 @@
 source ./folders.config.sh
 
-for STUDY in `ls -d ${PREFIX}/*`
+for STUDY in `ls -d ${CLEANING_DIR}/*`
 do
 	FN=`basename $STUDY`
 	if [ "$FN" == "00_SUMMARY" -o "$FN" == "00_ARCHIVE" ]
@@ -12,7 +12,7 @@ do
 	echo "Study: $FN"
 	echo "========================="
 
-	FREQ_PREFIX=${PREFIX}/$FN/freqs
+	FREQ_PREFIX=${CLEANING_DIR}/$FN/freqs
 	mkdir -p $FREQ_PREFIX
 
 	for STUDY_FILE in `ls $STUDY/data/*.gz`

@@ -15,13 +15,13 @@ fi
 for FN in `cat $1`
 do
 	echo -n "Find path for $FN: "
-	MYPATH=`find /storage/cleaning/ckdgenR5 -type d -name "${FN}*"`
+	MYPATH=`find ${PREFIX} -type d -name "${FN}*"`
 	if [ "$MYPATH" == "" ]
 	then
         	        echo "NOT FOUND => directory MISSING!!"
 	fi
 
-	MYPATHdata=`find /storage/cleaning/ckdgenR5/"${FN}"/data -type f -name "*$3*.gz"`
+	MYPATHdata=`find ${PREFIX}/"${FN}"/data -type f -name "*$3*.gz"`
         if [ "$MYPATHdata" == "" ]
         then
                         echo "NOT FOUND => FILE MISSING!!"
