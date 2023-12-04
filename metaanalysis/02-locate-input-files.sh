@@ -8,7 +8,7 @@ then
 	exit 3
 fi
 
-
+INPUT_MA_FILE=$PREFIX/metaanalysis/input-file-list.txt
 MA_P_DIR=${PREFIX}/metaanalysis/$Phenotype
 
 

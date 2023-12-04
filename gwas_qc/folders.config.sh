@@ -32,8 +32,5 @@ export STRATA="binary_overall quantitative_overall quantitative_sex_stratified"
 #Add your specific ancestry vector
 export ANCESTRY="EUR EAS SAS AFR AMR HIS MID"
 
-#Add to input file name needed for meta-analysisis
-export INPUT_MA_FILE=$PREFIX/metaanalysis/input-file-list.txt
-
 echo "Done."
 
