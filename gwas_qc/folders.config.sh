@@ -5,7 +5,7 @@
 #Add path where you are working on
 export PREFIX=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline_core
 
-#Add path to scripts directory
+#Add path to scripts gwas_qc directory
 export SCRIPTS_DIR=$PREFIX/scripts/gwas_qc
 
 #Add path to phenotype folder in upload directory
@@ -31,6 +31,10 @@ export STRATA="binary_overall quantitative_overall quantitative_sex_stratified"
 
 #Add your specific ancestry vector
 export ANCESTRY="EUR EAS SAS AFR AMR HIS MID"
+
+#Add path to scripts metaanalysis directory
+export SCRIPTS_MA=$PREFIX/scripts/metaanalysis
+
 
 echo "Done."
 
