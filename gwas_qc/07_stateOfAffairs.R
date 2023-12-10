@@ -122,7 +122,7 @@ my_plot = ggplot(sample_size_by_pheno_ancestry, aes(fill=POP, y=N, x=PHENO)) +
       scale_y_continuous(labels = label_comma()) +
       scale_x_discrete(guide = guide_axis(angle = 60)) +
       labs(x="Phenotype", y="Sample Size", 
-           title="CKDGen R5 Sample Size by Population and Phenotype",
+           title="Sample Size by Population and Phenotype",
            fill="Population")
   
 print(my_plot)
