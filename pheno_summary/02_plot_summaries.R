@@ -3,7 +3,10 @@ library(tidyr)
 library(ggplot2)
 require(lattice)
 
-
+args = commandArgs(trailingOnly = T)
+#PATHS
+output_folder= args[1]
+setwd(paste0(output_folder))
 
 ids <- read.delim("ids-summaries.txt", header = T)
 ids <- ids[order(ids$study),]

@@ -1,3 +1,8 @@
+args = commandArgs(trailingOnly = T)
+#PATHS
+output_folder= args[1]
+setwd(paste0(output_folder))
+
 parameters = data.frame()
 ids_summaries = data.frame()
 

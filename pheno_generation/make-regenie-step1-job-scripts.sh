@@ -39,8 +39,6 @@ fi
 cat > jobs/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_regenie_step1_${RUN_INDEX}_${BINARY_OR_QUANTITATIVE}_${PHENOTYPE_COLUMNS}.sh << EndOfCommand
 #!/bin/bash
 
-#SBATCH --chdir=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline
-
 # job name (abbreviated)
 #SBATCH -J r1_${BINARY_OR_QUANTITATIVE::1}${RUN_INDEX}
 
@@ -67,7 +65,6 @@ cat > jobs/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_regenie_step1_${RUN
 # max run time (hh:mm:ss)
 #SBATCH -t 96:00:00
 
-module load regenie/3.2.1
 
 $REGENIE \\
   --step 1 \\

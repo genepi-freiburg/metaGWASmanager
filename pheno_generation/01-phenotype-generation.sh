@@ -1,6 +1,4 @@
 #!/bin/bash
-# module load R/4.1.0-foss-2021a
-
 
 if [ "$1" == "" ]
 then

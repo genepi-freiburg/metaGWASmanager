@@ -1,6 +1,6 @@
 ---
 title: "metaGWASmanager documentation"
-date: "06/12/2023"
+date: "13/12/2023"
 output:
   html_document:
     df_print: paged
@@ -75,7 +75,7 @@ Besides the study-specific folders, it should also contain two additional direct
 
 
 #### GWAS Upload
-The GWAS results (output of **Phase 4 - SA: Perform Associations Analysis**) submitted by the SAs will be stored in the *uploads/assoc* directory. This directory will contain a folder for each study that has submitted summary statistics.
+The GWAS results (output of **Phase 4 - SA: Perform Associations Analysis**) submitted by the SAs will be stored in the *uploads/assoc* directory. This directory will contain a folder for each study that has submitted genetic summary statistics.
 
 
 ```{r, eval=FALSE}
@@ -173,9 +173,14 @@ The submited files within the **return_pheno** folder will be stored in the *upl
 "/storage/consortium_name/uploads/pheno/study_name"
 ```
 
-Subsequently, CA will manually inspect these files and plots in order to identify potential issues and inconsistencies. Furthermore, CA will run the scripts located in the **pheno_summary** directory of the metaGWASmanager toolkit (***01_collect_summary.R*** and ***02_plot_summaries.R***)
+Subsequently, CA will manually inspect these files and plots in order to identify potential issues and inconsistencies. Furthermore, CA will run the scripts located in the **pheno_summary** directory of the metaGWASmanager toolkit (***01_collect_summary.sh*** and ***02_plot_summaries.sh***). 
 
-Both scripts summarize phenotype summary-statistics submissions (***STUDYNAME_ids_summary.txt***)  across studies and also facilitate their representation for improved inter-study comparison and to detect potential outliers.
+Both scripts summarize phenotype summary-statistics submissions (***STUDYNAME_ids_summary.txt***)  across studies and also facilitate their representation for improved inter-study comparison and to detect potential outliers. Please run both scripts using the *bash* command line from:
+
+```{r, eval=FALSE}
+"/storage/consortium_name/scripts/pheno_summary"
+```
+
 
 Note that the generated outputs of the inter-study comparison analyses will be automatically saved in the *00_SUMMARY* folder located at:
 
@@ -234,7 +239,7 @@ Note that these scripts are set up to utilize a Slurm job scheduler.
 Upon making the mentioned adjustments, SAs can executed the ***02-make-regenie-jobs.sh*** script.
 
 ```{r, eval=FALSE}
-bash 02-make-regenie-jobs.sh parameters.txt
+bash 02-consortium-make-regenie-jobs.sh parameters.txt
 ```
 
 The process will generate the phenotypes and covariates details along with the necessary command lines to run *regenie*-steps. As a result, in the *jobs* folder, for *regenie*-step1, as many jobs as phenotype will be created, and one job for each phenotype and chromosome for *regenie*-step2.
@@ -261,7 +266,7 @@ The SAs will then run the ***04-postprocess-results.sh*** script, which investig
 bash 04-postprocess-results.sh
 ```
 
-If an issue occurs, SAs should investigate the cause. After resolving it, SAs can re-execute individual phenotypes and/or steps by using the appropriate files from the *jobs* directory. In case SAs needed to change any parameter o paths, they would have to re-run the ***make-regenie-step2-job-scripts.sh*** again.
+If an issue occurs, SAs should investigate the cause. After resolving it, SAs can re-execute individual phenotypes and/or steps by using the appropriate files from the *jobs* directory. In case SAs needed to change any parameter o paths, they would have to re-run the ***02-consortium-make-regenie-jobs.sh*** again.
 
 
 Finally, the results will be compiled into a compressed folder using ***05-collect-files-for-upload.sh***
@@ -309,6 +314,7 @@ bash 01_combine_chromosomes.sh study_name
 
 
 B) ***02_gwasinspector.sh***.
+
 CAs will then run GWASinspector:
 
 
@@ -316,13 +322,13 @@ CAs will then run GWASinspector:
 bash 02_gwasinspector.sh study_name
 ```
 
-GWASinspector performs an extensive quality control process on GWAS results ensuring their accuracy, proper format, and consistency across all studies using consistent criteria. As a result, in the *cleaning/study_name/qc_output* folder, clean and harmonized files will be created along with a comprehensive report and plots (including Manhattan and QQ plots, histograms, etc) as shown below:
+GWASinspector performs an extensive quality control process on GWAS results ensuring their accuracy, proper format, and consistency across all studies using robust criteria. As a result, in the *cleaning/study_name/qc_output* folder, clean and harmonized files will be created along with a comprehensive report and plots (including Manhattan and QQ plots, histograms, etc) as shown below:
 
 
-![GWASinspector output. Manhattan plots](C:/Users/zuley/OneDrive/Documentos/GitHub/gwas-consortium/images/03_GWASinspector_ManhattanQC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_M.png) *Manhattan plot created by GWASinpector workflow of overall eGFR creatinine in the GCKD cohort, a participatin study in the CKDGenR5 consortium.*
+![GWASinspector output. Manhattan plots](images/03_GWASinspector_ManhattanQC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_M.png) *Manhattan plot created by GWASinpector workflow of overall eGFR creatinine in the GCKD cohort, a participating study in the CKDGenR5 consortium.*
 
 
-![GWASinspector output. QC-plots](C:/Users/zuley/OneDrive/Documentos/GitHub/gwas-consortium/images/04_GWASInspector_QC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_histogram.png) *Quality controls plot created by GWASinpector workflow of overall eGFR creatinine in the GCKD cohort, a participatin study in the CKDGenR5 consortium.*
+![GWASinspector output. QC-plots](images/04_GWASInspector_QC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_histogram.png) *Quality controls plot created by GWASinpector workflow of overall eGFR creatinine in the GCKD cohort, a participating study in the CKDGenR5 consortium.*
 
 
 More information about GWASinspector R package [here](https://cran.r-project.org/web/packages/GWASinspector/index.html).
@@ -382,18 +388,11 @@ and generate a ***qc-stats.csv*** and ***qc-stats.xlsx*** files in the *00_SUMMA
 The ***qc-stats.csv*** contains information about the specific study, phenotype, ancestry, sample size, variants per chromosome, lambda and summary stats for both "All" and "High quality" variants such as P-value (PVAL), effect allele frequency (EFF_ALL_FREQ), imputation quality (IMP_QUALITY), effect size (BETA), standard error (STDERR). The file then, will contain as many rows as specific studies and phenotypes.
 
 
-| STUDY           | PHENO  | POP | PVALUE_MED_ALL | EFF_ALL_FREQ_MED_ALL | IMP_QUALITY_MED_ALL | BETA_MED_ALL |
-|-----------------|--------|-----|----------------|----------------------|---------------------|--------------|
-| GCKD_2022-10-04 | ckd    | EUR | 0.4822         | 0.001215             | 0.9469              | 0.01283      |
-| GCKD_2022-10-04 | ma     | EUR | 0.4787         | 0.001851             | 0.9572              | 0.008682     |
-| GCKD_2022-10-04 | gout   | EUR | 0.4743         | 0.001198             | 0.9466              | -0.0164      |
-
-
-| STDERR_MED_ALL | STDERR_MED_HQ | INPUT_VARIANT_COUNT | HQ_VARIANT_COUNT | AF_CORRELATION_ALL | LAMBDA | SAMPLE_SIZE | VARIANTS_CHR_1 |
-|----------------|---------------|---------------------|------------------|--------------------|----------------------|----------------|
-| 0.7595         | 0.07497       | 28713489            | 9179280          | 0.957              | 1.09   | 4993        | 2,193,932
-| 0.6586         | 0.08028       | 26066764            | 9180489          | 0.956              | 1.1    | 3998        | 1,985,785
-| 0.7984         | 0.07839       | 28814280            | 9179205          | 0.957              | 1.13   | 5034        | 2,201,949
+| STUDY           | PHENO  | POP | PVALUE_MED_ALL | EFF_ALL_FREQ_MED_ALL | IMP_QUALITY_MED_ALL | BETA_MED_ALL | STDERR_MED_ALL | STDERR_MED_HQ | INPUT_VARIANT_COUNT | HQ_VARIANT_COUNT | AF_CORRELATION_ALL | LAMBDA | SAMPLE_SIZE | VARIANTS_CHR_1 |
+|-----------------|--------|-----|----------------|----------------------|---------------------|--------------|----------------|---------------|---------------------|------------------|--------------------|--------|-------------|----------------|
+| GCKD_2022-10-04 | ckd    | EUR | 0.4822         | 0.001215             | 0.9469              | 0.01283      | 0.7595         | 0.07497       | 28713489            | 9179280          | 0.957              | 1.09   | 4993        | 2,193,932       |
+| GCKD_2022-10-04 | ma     | EUR | 0.4787         | 0.001851             | 0.9572              | 0.008682     | 0.6586         | 0.08028       | 26066764            | 9180489          | 0.956              | 1.1    | 3998        | 1,985,785       |
+| GCKD_2022-10-04 | gout   | EUR | 0.4743         | 0.001198             | 0.9466              | -0.0164      | 0.7984         | 0.07839       | 28814280            | 9179205          | 0.957              | 1.13   | 5034        | 2,201,949       |
 
 
 Command line to run:
@@ -436,7 +435,7 @@ Plots will be save in study-specific folder.
 "/storage/consortium_name/cleaning/study_name/freqs"
 ```
 
-![Frequency correlation plot](C:/Users/zuley/OneDrive/Documentos/GitHub/gwas-consortium/images/05_frq_plot.PNG) *Frequency correlation plot of overall eGFR creatinine in the GCKD cohort, a participatin study in the CKDGenR5 consortium.*
+![Frequency correlation plot](images/05_frq_plot.PNG) *Frequency correlation plot of overall eGFR creatinine in the GCKD cohort, a participatin study in the CKDGenR5 consortium.*
 
 
 
@@ -451,18 +450,7 @@ bash 07_stateOfAffairs.sh
 ```
 
 
-H) ***08_compareGsheet.sh***
-
-It compares the Google sheet and the ***qc-stats.csv*** file to check for the presence of the same number of studies in both files.
-
-Command line to run:
-
-```{r, eval=FALSE}
-bash 08_compareGsheet.sh
-```
-
-
-I) ***09_checkAllFileNames.sh***
+H) ***08_checkAllFileNames.sh***
 
 For proper execution of subsequent steps (Auto GWAS quality control and meta-analysis) a final check is important to ensure consistency in files names, studies and phenotypes. The ***09_checkAllFileNames.sh*** scripts systematically validate these aspects and report if any inconsistencies arise.
 
@@ -471,7 +459,7 @@ For proper execution of subsequent steps (Auto GWAS quality control and meta-ana
 bash 09_checkAllFileNames.sh
 ```
 
-J) ***10_GWAS_QC_multistudies.sh***
+I) ***09_GWAS_QC_multistudies.sh***
 
 By combining the summary statistics from GWAS QC (***qc-stats.csv***) and the results of positive controls analysis (***positive-controls.csv***) across all participating studies, CA will perform a final checking process. A set of relevant items will be checked, including:  wrong genomic build, allele switches and swaps, missing data, file and number formatting issues, unaccounted inflation, and wrong transformations, among others.
 
@@ -503,9 +491,9 @@ After completing all GWAS quality controls checks, CAs are pepared to proceed wi
 "/storage/consortium_name/scripts/metaanalysis"
 ```
 
-K) ***02-locate-input-files.sh***
+J) ***01-locate-input-files.sh***
 
-First, CAs must prepare the ***input-file-list.txt*** containing all the studies name to be meta-analyzed as follows:
+First, CAs must prepare the ***input-file-list.txt*** containing all the study names to be meta-analyzed as follows:
 
 |                        |
 |------------------------|
@@ -522,16 +510,16 @@ The file should be save withing the created *metaanalysis* directory.
 "/storage/consortium_name/metaanalysis"
 ```
 
-Given a phenotype (e.g., uacr_int) the ***02-locate-input-files.sh*** script creates the ***input-files-with-path.txt*** file with the full paths to the cleaned *regenie*-step2 files for the specific phenotype across all studies intended for meta-analysis.
+Given a phenotype (e.g., uacr_int) the ***01-locate-input-files.sh*** script creates the ***input-files-with-path.txt*** file with the full paths to the cleaned *regenie*-step2 files for the specific phenotype across all studies intended for meta-analysis.
 
 ```{r, eval=FALSE}
-bash 02-locate-input-files.sh uacr_int
+bash 01-locate-input-files.sh uacr_int
 ```
 
 
-L) ***03-prepare-ma-input.HQ.sh*** and ***03-prepare-ma-input.LQ.sh***
+K) ***02-prepare-ma-input.HQ.sh*** and ***02-prepare-ma-input.LQ.sh***
 
-They are both mostly the same scripts, but the first with stringent filter settings and second with lenient filter settings.Based on the filter configurations, input files per specific phenotype and study will be generated in the *input* folder.
+They are both mostly the same scripts, but the first with stringent filter settings and second with lenient filter settings. Based on the filter configurations, input files per specific phenotype and study will be generated in the *input* folder.
 
 
 ```{r, eval=FALSE}
@@ -541,11 +529,11 @@ They are both mostly the same scripts, but the first with stringent filter setti
 Command line to run:
 
 ```{r, eval=FALSE}
-bash 03-prepare-ma-input.HQ.sh uacr_int
+bash 02-prepare-ma-input.HQ.sh uacr_int
 ```
 
 
-M) ***05-prepare-metal-params.sh***
+L) ***03-prepare-metal-params.sh***
 
 It creates the ***metal-params.txt*** file needed to perform meta-analysis. CAs can find the generated file at:
 
@@ -556,17 +544,17 @@ It creates the ***metal-params.txt*** file needed to perform meta-analysis. CAs 
 To run the script, the phenotype (e.g., uacr_int) and type of selected variants (e.g, LQ or HQ) must be provided as arguments:
 
 ```{r, eval=FALSE}
-bash 05-prepare-metal-params.sh uacr_int HQ
+bash 03-prepare-metal-params.sh uacr_int HQ
 ```
 
 
-N) ***06-run-metal.sh***
+M) ***04-run-metal.sh***
 
 Finally, run meta-analysis as follow:
 
 
 ```{r, eval=FALSE}
-bash 06-run-metal.sh uacr_int HQ
+bash 04-run-metal.sh uacr_int HQ
 ```
 
 Results will be stored in a **output** folder:

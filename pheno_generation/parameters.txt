@@ -92,7 +92,7 @@ blood_metals_available 1
 
 # Are plasma metal avilable?
 # "yes" or "no" 
-plasma_metals_available 1
+plasma_metals_available "yes"
 
 # Were plasma metal measured in plasma or serum?
 # "plasma" or "serum" or give -1 if you do not have plasma metals available
