@@ -110,7 +110,6 @@ additional_covariables ""
 
 # which additional (study-specific) covariables to use
 # (default none, may give multiple comma-separated column names)
-# don't give sex, age, PCs - we take care of this automatically
 # use this option for categorical covariables such as study center
 additional_categorical_covariables ""
 
