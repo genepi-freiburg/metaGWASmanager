@@ -1,0 +1,8 @@
+all_hg38.pgen
+all_hg38.pgen.zst
+all_hg38_rs_noannot.pvar
+all_hg38_rs_noannot.pvar.zst
+extract_rs4293393.log
+extract_rs4293393.raw
+hg38_corrected.psam
+qc_pass*
