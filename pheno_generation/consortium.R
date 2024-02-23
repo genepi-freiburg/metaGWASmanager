@@ -7,7 +7,7 @@ print(paste0("Welcome to the ",get_consortium_name (), " script!"))
 #Check if the two required arguments are given
 arguments = commandArgs(trailingOnly = TRUE)
 if (length(arguments) != 2) {
-  stop("Arguments: <parameter_file_name> <pheno_or_jobs_mode>")
+  stop("Arguments: <parameter_file_name> or <mode> missing")
 }
 
 #Check if mode is given in the .sh script

@@ -66,6 +66,7 @@ $PLINK \\
   --pfilter 0.01 \\
   --threads 4 \\
   --memory 10000 \\
+  --write-samples \\
   --out output_plink/${STUDY}_${ANCESTRY}_${REFPANEL}_${ANALYSIS_DATE}_${BINARY_OR_QUANTITATIVE}_${RUN_INDEX}_chr${CHR} \\
 
 EndOfCommand

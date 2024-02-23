@@ -36,6 +36,7 @@ get_required_parameters<- function (parameters) {
   
   if (parameters$value[parameters$key== "plasma_metals_available"]=="yes") {
     required_parameters <- c(required_parameters,   "plasma_or_serum")
+    return(required_parameters)
   }
 }
 
@@ -64,6 +65,7 @@ get_required_columns<- function (parameters_list) {
     required_columns <- c(required_columns,   
                           "age_plasmametal", "smoking_plasmametal","bmi_plasmametal")
   }
+  return(required_columns)
   
 }
 
@@ -74,7 +76,8 @@ get_optional_columns<- function () {
   blood_metals <- c ()
   plasma_metals<- c ("cadmium_plasma", "selenium_plasma", "arsenic_plasma")
   
-  optional_columns<- c(urine_metals, blood_metals, plasma_metals) 
+  optional_columns<- c(urine_metals, blood_metals, plasma_metals)
+  return(optional_columns)
 }
 
 
@@ -595,6 +598,147 @@ for JOB_FN in `ls jobs/*_plink_*.sh`
   }
   
 }
+
+##############################################
+###             GWAS_post-process           ##
+##############################################
+# FUNCTION 13 --- CHECK LOG FILES ACCORDING TO THE SELECTED ASSOCIATION TOOL
+check_log_files <- function(GWAS_tool) {
+  if (GWAS_tool=="regenie"){
+    
+    bash_script1 <- "
+#!/bin/bash
+
+for JOB_NUM in `ls -l jobs/*step1* | cut -d\"_\" -f7 | sort -n`
+do
+	LOG_FILE=$(ls output_regenie_step1/*_${JOB_NUM}.log 2>/dev/null)
+	if [ \"$?\" -ne 0 ]
+	then
+		echo \"ERROR: Step 1 log file for job $JOB_NUM does not exist.\"
+	else
+		end_time=$(grep \"End time\" $LOG_FILE)
+		if [ \"$end_time\" == \"\" ]
+		then
+			echo \"ERROR: Step 1 run $JOB_NUM did not complete successfully: $LOG_FILE\"
+		else
+			echo \"OK: Step 1 run $JOB_NUM: $end_time\"
+		fi
+	fi
+done
+"
+    bash_script2 <- "
+#!/bin/bash
+
+for JOB_NUM in `ls -l jobs/*step1* | cut -d\"_\" -f7 | sort -n`
+do
+for CHR in `seq 1 22` X
+do
+	LOG_FILE=$(ls output_regenie_step2/*_${JOB_NUM}_chr${CHR}.log 2>/dev/null)
+	if [ \"$?\" -ne 0 ]
+	then
+		echo \"ERROR: Step 2 log file for job $JOB_NUM / chromosome $CHR does not exist.\"
+	else
+		end_time=$(grep \"End time\" $LOG_FILE)
+		if [ \"$end_time\" == \"\" ]
+		then
+			echo \"ERROR: Step 2 run $JOB_NUM / chromosome $CHR did not complete successfully: $LOG_FILE\"
+		else
+			echo \"OK: Step 2 run $JOB_NUM / chromosome $CHR: $end_time\"
+		fi
+	fi
+done
+done
+"
+    #write
+    writeLines(bash_script1, "check_step1_logs.sh")
+    writeLines(bash_script2, "check_step2_logs.sh")
+    
+    #submit
+    system("bash check_step1_logs.sh | grep ERROR | tee return_pheno/check_step1_logs.log")
+    system("bash check_step2_logs.sh | grep ERROR | tee return_pheno/check_step2_logs.log")
+    
+    
+  } else {
+    if ((GWAS_tool=="plink")) {
+      bash_script1 <- "
+#!/bin/bash
+
+for JOB_NUM in `ls -l jobs/*plink* | cut -d\"_\" -f6 | sort -n`
+do
+for CHR in `seq 1 22` X
+do
+	LOG_FILE=$(ls output_plink/*_${JOB_NUM}_chr${CHR}.log 2>/dev/null)
+	if [ \"$?\" -ne 0 ]
+	then
+		echo \"ERROR: log file for job $JOB_NUM / chromosome $CHR does not exist.\"
+	else
+		end_time=$(grep \"End time\" $LOG_FILE)
+		if [ \"$end_time\" == \"\" ]
+		then
+			echo \"ERROR: plink run $JOB_NUM / chromosome $CHR did not complete successfully: $LOG_FILE\"
+		else
+			echo \"OK: plink run $JOB_NUM / chromosome $CHR: $end_time\"
+		fi
+	fi
+done
+done
+"
+      #write
+      writeLines(bash_script1, "check_logs.sh")
+
+      #submit
+      system("bash check_logs.sh | grep ERROR | tee return_pheno/check_logs.log")
+
+    }
+  }
+  
+}
+
+
+# FUNCTION 14 --- GET IDS FILE FOR SUMSTATS ACCORDING TO THE SELECTED ASSOCIATION TOOL
+get_assoc_ids<- function(GWAS_tool) {
+  if (GWAS_tool=="regenie"){
+    id_file_pattern = paste0(fn_end_string, "_.*_chr1_", pheno, ".regenie.ids")
+    id_file = list.files(path = "output_regenie_step2", 
+                         pattern = id_file_pattern)
+  } else {
+    if ((GWAS_tool=="plink")) {
+      id_file_pattern = paste0(fn_end_string, "_.*_.*_chr1.", pheno, "\\.glm..*")
+      id_file = list.files(path = "output_plink", 
+                           pattern = id_file_pattern)
+      id_file<-sub(paste0(pheno, ".*"), "id", id_file)
+    }
+  }
+  return(id_file)
+}
+
+# FUNCTION 15 --- GET IDs FILE ACCORDING TO THE SELECTED ASSOCIATION TOOL
+get_read_ids<- function(GWAS_tool) {
+  if (GWAS_tool=="regenie"){
+    pheno_ids = read.table(paste0("output_regenie_step2/", id_file), h=T)
+  } else {
+    if ((GWAS_tool=="plink")) {
+      pheno_ids = read.table(paste0("output_plink/", id_file), h=F)
+    }
+  }
+  return(pheno_ids)
+}
+
+
+# FUNCTION 15 --- SELECT FOLDER TO UPLOAD (NO INDIVUAL DATA) ACCORDING TO THE SELECTED ASSOCIATION TOOL
+get_folder_for_upload<- function(GWAS_tool) { # Separete folder by spaces
+  if (GWAS_tool=="regenie"){
+    folders <- c("return_pheno output_regenie_step2 output_regenie_step1/*.log logs")
+  } else {
+    if ((GWAS_tool=="plink")) {
+      folders <- c("return_pheno output_plink logs")
+    }
+  }
+  return(folders)
+}
+
+
+
 
 
 ##############################################
