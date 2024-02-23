@@ -12,8 +12,8 @@ if (length(arguments) != 2) {
 
 #Check if mode is given in the .sh script
 mode = arguments[2]
-if (mode != "pheno" && mode != "jobs") {
-  stop("Expect mode to be 'pheno' or 'jobs'.")
+if (mode != "pheno" && mode != "jobs" && mode != "submit") {
+  stop("Expect mode to be 'pheno', 'jobs' or 'submit'.")
 }
 
 #############################################################################
@@ -689,86 +689,34 @@ for (phenotype in names(age_for_phenotype)) {
 
 
 if (mode == "jobs") {
+  #############################################################################
+  ## F. Output association commands
+  #############################################################################
+  # Use "get_GWAS_tool_name" function modified by the consortium core
+  GWAS_tool<-get_GWAS_tool_name() 
+  print(paste0("Association tool to use: ",get_GWAS_tool_name ()))
+  
+  #Use "determine_phenotypes_covariables" function modified by the consortium core
+  jobs_phenos <- determine_phenotypes_covariables (parameters_list)
+  
+  #Use "make_assoc_jobs" function modified by the consortium core. It creates association jobs
+  make_assoc_jobs(job_phenos, GWAS_tool, parameters_list, study_covar_cols, study_cat_cols)
+  
+}
+
 #############################################################################
-## F. Output REGENIE commands
+## G. Submit jobs
 #############################################################################
-script_fn <- paste0("output_pheno/make-regenie-jobs.sh")
-cat("#!/bin/bash
+if (mode == "submit") {
+  # Use "get_GWAS_tool_name" function modified by the consortium core
+  GWAS_tool<-get_GWAS_tool_name() 
+  print(paste0("Association tool to use: ",get_GWAS_tool_name ()))
   
-", file = script_fn, append = F)
-
-run_idx = 0
-#Use "determine_phenotypes_covariables" function modified by the consortium core
-jobs_phenos <- determine_phenotypes_covariables ()
-
-phenos<- jobs_phenos$Phenotypes
-
-missing_phenos <- c()
-for (i in 1:length(phenos)) {
-  pheno = phenos[i]
-  if (length(which(!is.na(result[, pheno]))) == 0) {
-    print(paste("Omitting phenotype", pheno, "as it is missing completely."))
-    missing_phenos = c(missing_phenos, i)
-  }
-}
-
-if (length(missing_phenos) > 0) {
-  phenos <- phenos[-missing_phenos]
-}
-
-for (pheno in phenos) {
-  age <- age_for_phenotype[pheno]
-  if (is.na(age)) {
-    stop(paste0("unexpected phenotype: ", pheno))
-  }
+  #Use "create_submit_all_jobs_script" function modified by the consortium core
+  create_submit_all_jobs_script(GWAS_tool)
   
-  quant_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Quant_covar"], study_covar_cols)
-  cat_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Cat_covar"], study_cat_covar_cols)
-  type <- jobs_phenos[jobs_phenos$Phenotypes == pheno, "Type"]
-  
-  run_idx = run_idx + 1
-  print(paste0("== RUN ", run_idx, ": ", type))
-  print(paste0("Phenotype: ", pheno))
-  print(paste0("Quantitative covariates: ", paste(quant_covars, collapse=", ")))
-  if(!is.na(cat_covars)) {
-    print(paste0("Categorical covariates: ", paste(cat_covars, collapse=", ")))
-  }
-
-  for (step in c("step1", "step2")) {  
-    if(is.na(cat_covars)){
-      cat(paste0("./make-regenie-", step, "-job-scripts.sh ",
-                 name, " ",
-                 study, " ",
-                 ref_panel, " ", 
-                 date, " ",
-                 type, " ",
-                 pheno, " '",
-                 quant_covars, "' '",
-                 "' ",
-                 run_idx, "\n"),
-          append = T, file = script_fn)
-    } else {
-      cat(paste0("./make-regenie-", step, "-job-scripts.sh ",
-                 name, " ",
-                 study, " ",
-                 ref_panel, " ", 
-                 date, " ",
-                 type, " ",
-                 pheno, " '",
-                 quant_covars, "' '",
-                 cat_covars, "' ",
-                 run_idx, "\n"),
-          append = T, file = script_fn)
-    }
-  }
 }
 
-if (run_idx == 0) {
-  print("ERROR: No runs planned. Everything missing?")
-} else {
-  print(paste0("Planned ", run_idx, " runs."))
-}
-}
 
 print("Script finished successfully.")
 

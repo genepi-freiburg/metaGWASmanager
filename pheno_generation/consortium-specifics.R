@@ -363,7 +363,7 @@ get_age_for_phenotype<- function() {
 #phenotype          covariables   catCovariables
 #egfr_creat_female  age,PC{1:40}  studycenter
 #egfr_creat_int     age,PC{1:40}  sex,studycenter
-determine_phenotypes_covariables <- function() {
+determine_phenotypes_covariables <- function(parameters_list) {
   #1.Define your quantitative phenotypes vectors:
   quant_pheno1<- c("cadmium_urine", "cadmium_urine_female", "cadmium_urine_male", "cadmium_urine_neversmk",
                    "selenium_urine", "selenium_urine_female", "selenium_urine_male", "selenium_urine_neversmk",
@@ -425,6 +425,175 @@ determine_phenotypes_covariables <- function() {
   
   return(data_frame)
     
+}
+
+
+
+# FUNCTION 10 --- CHOOSE THE DESIRED ASSOCIATION TOOL
+get_GWAS_tool_name <- function() {
+  c("regenie") #plink, regenie, BOLT
+}
+
+
+# FUNCTION 11 --- MAKE JOBS ACCORDING TO THE SELECTED ASSOCIATION TOOL
+make_assoc_jobs <- function(job_phenos, GWAS_tool, parameters_list, study_covar_cols, study_cat_cols) {
+  script_fn <- paste0("output_pheno/make-assoc-jobs.sh")
+  cat("#!/bin/bash
+", file = script_fn, append = F)
+  
+  run_idx = 0
+  phenos<- jobs_phenos$Phenotypes
+  
+  missing_phenos <- c()
+  for (i in 1:length(phenos)) {
+    pheno = phenos[i]
+    if (length(which(!is.na(result[, pheno]))) == 0) {
+      print(paste("Omitting phenotype", pheno, "as it is missing completely."))
+      missing_phenos = c(missing_phenos, i)
+    }
+  }
+  
+  if (length(missing_phenos) > 0) {
+    phenos <- phenos[-missing_phenos]
+  }
+  
+  for (pheno in phenos) {
+    age <- age_for_phenotype[pheno]
+    if (is.na(age)) {
+      stop(paste0("unexpected phenotype: ", pheno))
+    }
+    
+    quant_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Quant_covar"], study_covar_cols)
+    cat_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Cat_covar"], study_cat_covar_cols)
+    covars<- paste(cat_covars, quant_covars, sep = ",")
+    type <- jobs_phenos[jobs_phenos$Phenotypes == pheno, "Type"]
+    
+    run_idx = run_idx + 1
+    print(paste0("== RUN ", run_idx, ": ", type))
+    print(paste0("Phenotype: ", pheno))
+    print(paste0("Quantitative covariates: ", paste(quant_covars, collapse=", ")))
+    if(!is.na(cat_covars)) {
+      print(paste0("Categorical covariates: ", paste(cat_covars, collapse=", ")))
+    }
+    
+    if (GWAS_tool=="regenie"){
+      folders <- c("regenie_temp", "logs", "output_regenie_step1", "output_regenie_step2", "jobs")
+      # Create regenie folders
+      for (folder in folders) {
+        dir.create(folder, recursive = TRUE, showWarnings = FALSE)
+      }
+      
+      #Create jobs
+      for (step in c("step1", "step2")) {  
+        if(is.na(cat_covars)){
+          cat(paste0("./make-regenie-", step, "-job-scripts.sh ",
+                     parameters_list$study_name, " ",
+                     parameters_list$ancestry, " ",
+                     parameters_list$refpanel, " ", 
+                     parameters_list$analysis_date, " ",
+                     type, " ",
+                     pheno, " '",
+                     quant_covars, "' '",
+                     "' ",
+                     run_idx, "\n"),
+              append = T, file = script_fn)
+        } else {
+          cat(paste0("./make-regenie-", step, "-job-scripts.sh ",
+                     parameters_list$study_name, " ",
+                     parameters_list$ancestry, " ",
+                     parameters_list$refpanel, " ", 
+                     parameters_list$analysis_date, " ",
+                     type, " ",
+                     pheno, " '",
+                     quant_covars, "' '",
+                     cat_covars, "' ",
+                     run_idx, "\n"),
+              append = T, file = script_fn)
+        }
+      }
+      
+    } else {
+      if (GWAS_tool=="plink") {
+        
+        #Create folders
+        folders <- c("regenie_temp", "logs", "output_plink","jobs")
+        # Create folders
+        for (folder in folders) {
+          dir.create(folder, recursive = TRUE, showWarnings = FALSE)
+        }
+        
+        #Create plink jobs
+        cat(paste0("./make-plink-job-scripts.sh ",
+                   parameters_list$study_name, " ",
+                   parameters_list$ancestry, " ",
+                   parameters_list$refpanel, " ", 
+                   parameters_list$analysis_date, " ",
+                   type, " ",
+                   pheno, " '",
+                   covars, "' ",
+                   run_idx, "\n"),
+            append = T, file = script_fn)
+        
+        cat_covars_s<-strsplit(cat_covars, ",")[[1]]
+        result[cat_covars_s] <- lapply(result[cat_covars_s], function(x) replace(x, is.na(x), "NONE"))
+        write.table(result, data_fn, 
+                    row.names = F, col.names = T, sep = "\t", quote = F)
+        
+      }#Plink assoc tool
+      
+    }
+    
+  }
+  
+  if (run_idx == 0) {
+    print("ERROR: No runs planned. Everything missing?")
+  } else {
+    print(paste0("Planned ", run_idx, " runs."))
+  }
+}
+
+
+# FUNCTION 12 --- SUBMIT ALL JOBS ACCORDING TO THE SELECTED ASSOCIATION TOOL
+create_submit_all_jobs_script <- function(GWAS_tool) {
+  if (GWAS_tool=="regenie"){
+    
+    bash_script <- "
+#!/bin/bash
+
+for STEP1_JOB_FN in $(ls jobs/*_regenie_step1_*.sh)
+do
+    # we need the AWK command to extract the job ID (sbatch returns 'Submitted batch job 123')
+    STEP1_JOB=$(sbatch $STEP1_JOB_FN | awk '{ print $4 }')
+    echo \"Submitted REGENIE step 1 job: ID = $STEP1_JOB, File = $STEP1_JOB_FN\"
+
+    STEP2_JOB_FNS=$(echo $STEP1_JOB_FN | sed 's/step1/step2/' | sed 's/.sh/_chr*.sh/')
+
+    for STEP2_JOB_FN in $(ls $STEP2_JOB_FNS)
+    do
+        sbatch -d afterok:$STEP1_JOB $STEP2_JOB_FN
+        echo \"Submitted REGENIE step 2 job after step 1 is ok: $STEP2_JOB_FN\"
+    done
+done
+"
+    #write
+    writeLines(bash_script, "submit-all-jobs.sh")
+    
+  } else {
+    if ((GWAS_tool=="plink")) {
+      bash_script <- "
+#!/bin/bash
+for JOB_FN in `ls jobs/*_plink_*.sh`
+		do
+		JOB=$(sbatch $JOB_FN | awk '{ print $4 }')
+		echo \"Submitted PLINK : ID = $JOB, File = $JOB_FN\"
+	done
+"
+      #write
+      writeLines(bash_script, "submit-all-jobs.sh")
+      
+    }
+  }
+  
 }
 
 
