@@ -9,12 +9,12 @@ fi
 
 source ./folders.config.sh
 
-IN_PATH=${GWAS_UPLOAD_DIR}/$STUDY_ID/output_regenie_step2 
+IN_PATH=${GWAS_UPLOAD_DIR}/$STUDY_ID/$ASSOC_FOLDER
 OUT_PATH=${CLEANING_DIR}/$STUDY_ID/data
 
 if [ ! -d "$IN_PATH" ]
 then
-	echo "Please give a path to the REGENIE step 2 output dir as the first argument to this script."
+	echo "Please give a path to the association output dir as the first argument to this script."
 	exit 9
 fi
 
@@ -22,6 +22,10 @@ if [ ! -d "$OUT_PATH" ]
 then
 	echo "Please give a path to the output dir as the second argument to this script."
 	exit 9
+fi
+
+if [ "$ASSOC_TOOL" != "regenie" ]; then
+    . $SUPPORT_SCRIPT "$IN_PATH"
 fi
 
 REQ_COLS="CHROM GENPOS ID ALLELE0 ALLELE1 A1FREQ INFO N BETA SE LOG10P"
@@ -78,7 +82,7 @@ do
 		continue
 	fi
 
-	PHENO=`basename $PHENO | sed s/_chr1_/_/ | sed s/_chrAll_/_/ | sed s/.regenie// | sed s/.gz//`
+	PHENO=`basename $PHENO | sed s/_chr1_/_/ | sed s/_chrAll_/_/ | sed s/.${ASSOC_TOOL}// | sed s/.gz//`
 	OUT_FN=${OUT_PATH}/${PHENO}.gwas
 	echo "Process phenotype: $PHENO => $OUT_FN"
 

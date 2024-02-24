@@ -731,13 +731,11 @@ get_folder_for_upload<- function(GWAS_tool) { # Separete folder by spaces
     folders <- c("return_pheno output_regenie_step2 output_regenie_step1/*.log logs")
   } else {
     if ((GWAS_tool=="plink")) {
-      folders <- c("return_pheno output_plink logs")
+      folders <- c("return_pheno logs output_plink/ | grep -v '\.id$'")
     }
   }
   return(folders)
 }
-
-
 
 
 

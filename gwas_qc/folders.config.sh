@@ -3,7 +3,7 @@
 #Adjusted the script according your requirements
 
 #Add path where you are working on
-export PREFIX=/data/cne/ec/ieg/Crew/zulema.rodriguez/Consortium_pipeline_core
+export PREFIX=/data/cne/ec/ieg/Crew/zulema.rodriguez/storage_regenie
 
 #Add path to scripts gwas_qc directory
 export SCRIPTS_DIR=$PREFIX/scripts/gwas_qc
@@ -13,6 +13,17 @@ export PHENO_UPLOAD_DIR=$PREFIX/uploads/pheno
 
 #Add path to associations folder in upload directory
 export GWAS_UPLOAD_DIR=$PREFIX/uploads/assoc
+
+#Add association tool used
+export ASSOC_TOOL=regenie #For plink "plink"
+
+#In case you did not use regenie, probably you should change columns names and order
+#to properly execute the metaGWASmanager pipeline
+#Please provide a script to adjust columns. Here an example in case you use plink
+export SUPPORT_SCRIPT=order_assoc_results_columns.sh
+
+#Add name of associations results
+export ASSOC_FOLDER=output_regenie_step2  #For plink it would be "output_plink"
 
 #Add path to cleaning directory
 export CLEANING_DIR=$PREFIX/cleaning
