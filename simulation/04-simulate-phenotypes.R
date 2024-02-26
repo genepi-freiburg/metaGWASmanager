@@ -32,18 +32,18 @@ d = merge(d, geno2)
 nrow(d)
 
 
-d$egfr0 = rnorm(nrow(d), 90, 20)
-d$egfr1 = rnorm(nrow(d), 80, 20)
-d$egfr2 = rnorm(nrow(d), 70, 20)
+d$crea0 = rnorm(nrow(d), 1.0, 0.1)
+d$crea1 = rnorm(nrow(d), 1.1, 0.1)
+d$crea2 = rnorm(nrow(d), 1.2, 0.1)
 
 summary(d)
 
 
-d$egfr = ifelse(d$rs4293393_A == 0, d$egfr0, ifelse(d$rs4293393_A == 1, d$egfr1, d$egfr2))
-d$egfr = ifelse(d$egfr > 0, d$egfr, 0)
-d$egfr0 = NULL
-d$egfr1 = NULL
-d$egfr2 = NULL
+d$crea = ifelse(d$rs4293393_A == 0, d$crea0, ifelse(d$rs4293393_A == 1, d$crea1, d$crea2))
+d$crea = ifelse(d$crea > 0, d$crea, 0)
+d$crea0 = NULL
+d$crea1 = NULL
+d$crea2 = NULL
 
 d$age = rnorm(nrow(d), 50, 5)
 d$age = ifelse(d$age > 0, d$age, 0)
@@ -54,10 +54,14 @@ d$PC3 = rnorm(nrow(d))
 d$PC4 = rnorm(nrow(d))
 d$PC5 = rnorm(nrow(d))
 
+d$SEX[which(d$SEX == 1)] = 'M'
+d$SEX[which(d$SEX == 2)] = 'F' 
+d$SEX = as.factor(d$SEX)
 
-d$PAT = NULL
-d$MAT = NULL
-d$Population = NULL
+colnames(d)[which(colnames(d)=="PAT")] = c("FID") # rename second column from PAT to FID
+d$FID = d$IID
+d$MAT = NULL 
+d$Population = NULL 
 d$rs4293393_A = NULL
 
 summary(d)
