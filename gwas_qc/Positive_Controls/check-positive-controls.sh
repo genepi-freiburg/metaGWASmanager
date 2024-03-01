@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_DIR= ${SCRIPTS_DIR}/Positive_Controls
+SCRIPT_DIR=${SCRIPTS_DIR}/Positive_Controls
 STUDY_DIR=$1
 if [ ! -d "$1" ]
 then
