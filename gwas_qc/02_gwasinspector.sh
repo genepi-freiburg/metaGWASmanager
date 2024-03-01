@@ -23,7 +23,7 @@ fi
 if [ ! -f "$MYDIR/config.ini" ]
 then
 	echo "config.ini not found: Creating one."
-	cat ${SCRIPTS_DIR}/GWASinspector/config.ini.template | sed -e "s/CLEAN_DIR/$(echo $CLEAN_DIR | sed 's/\//\\\//g')/g" -e "s/REF_DIR/$(echo $REF_DIR | sed 's/\//\\\//g')/g" > $MYDIR/config.ini
+	cat ${SCRIPTS_DIR}/GWASinspector/config.ini.template | sed -e "s/CLEANING_DIR/$(echo $CLEAN_DIR | sed 's/\//\\\//g')/g" -e "s/REF_DIR/$(echo $REF_DIR | sed 's/\//\\\//g')/g" > $MYDIR/config.ini
 fi
 
 mkdir -p ${CLEAN_DIR}/qc-output
