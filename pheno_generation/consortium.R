@@ -700,7 +700,7 @@ if (mode == "jobs") {
   jobs_phenos <- determine_phenotypes_covariables (parameters_list)
   
   #Use "make_assoc_jobs" function modified by the consortium core. It creates association jobs
-  make_assoc_jobs(job_phenos, GWAS_tool, parameters_list, study_covar_cols, study_cat_cols)
+  make_assoc_jobs(jobs_phenos, GWAS_tool, parameters_list, study_covar_cols, study_cat_cols)
   
 }
 

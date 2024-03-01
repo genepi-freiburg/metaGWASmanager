@@ -439,7 +439,7 @@ get_GWAS_tool_name <- function() {
 
 
 # FUNCTION 11 --- MAKE JOBS ACCORDING TO THE SELECTED ASSOCIATION TOOL
-make_assoc_jobs <- function(job_phenos, GWAS_tool, parameters_list, study_covar_cols, study_cat_cols) {
+make_assoc_jobs <- function(jobs_phenos, GWAS_tool, parameters_list, study_covar_cols, study_cat_cols) {
   script_fn <- paste0("output_pheno/make-assoc-jobs.sh")
   cat("#!/bin/bash
 ", file = script_fn, append = F)
