@@ -264,7 +264,7 @@ The SAs will then run the ***04-postprocess-results.sh*** script, which investig
 
 
 ```{r, eval=FALSE}
-bash 04-postprocess-results.sh
+bash 04-postprocess-results.sh parameters.txt
 ```
 
 If an issue occurs, SAs should investigate the cause. After resolving it, SAs can re-execute individual phenotypes and/or steps by using the appropriate files from the *jobs* directory. In case SAs needed to change any parameter o paths, they would have to re-run the ***02-consortium-make-regenie-jobs.sh*** again.
