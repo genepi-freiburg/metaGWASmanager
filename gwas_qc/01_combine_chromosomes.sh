@@ -14,13 +14,13 @@ OUT_PATH=${CLEANING_DIR}/$STUDY_ID/data
 
 if [ ! -d "$IN_PATH" ]
 then
-	echo "Please give a path to the association output dir as the first argument to this script."
+	echo "$IN_PATH does not exist. Please create it to continue."
 	exit 9
 fi
 
 if [ ! -d "$OUT_PATH" ]
 then
-	echo "Please give a path to the output dir as the second argument to this script."
+	echo "$OUT_PATH does not exist. Please create it to continue."
 	exit 9
 fi
 
