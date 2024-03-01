@@ -1,5 +1,7 @@
 # TODO do we need to take care of paths?
 source("consortium-specifics.R")
+source("assoc_tool/assoc_tool_plugin.R")
+
 
 arguments = commandArgs(trailingOnly = TRUE)
 

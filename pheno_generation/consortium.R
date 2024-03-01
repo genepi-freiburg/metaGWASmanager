@@ -1,5 +1,6 @@
 # TODO do we need to take care of paths?
 source("consortium-specifics.R")
+source("assoc_tool/assoc_tool_plugin.R")
 
 # Use "get_consortium_name" function modified by the consortium core
 print(paste0("Welcome to the ",get_consortium_name (), " script!"))
@@ -699,7 +700,7 @@ if (mode == "jobs") {
   #Use "determine_phenotypes_covariables" function modified by the consortium core
   jobs_phenos <- determine_phenotypes_covariables (parameters_list)
   
-  #Use "make_assoc_jobs" function modified by the consortium core. It creates association jobs
+  #Creating jobs
   make_assoc_jobs(jobs_phenos, GWAS_tool, parameters_list, study_covar_cols, study_cat_cols)
   
 }
@@ -712,7 +713,7 @@ if (mode == "submit") {
   GWAS_tool<-get_GWAS_tool_name() 
   print(paste0("Association tool to use: ",get_GWAS_tool_name ()))
   
-  #Use "create_submit_all_jobs_script" function modified by the consortium core
+  #Submit jobs
   create_submit_all_jobs_script(GWAS_tool)
   
 }
