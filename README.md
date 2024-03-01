@@ -436,7 +436,7 @@ Plots will be save in study-specific folder.
 "/storage/consortium_name/cleaning/study_name/freqs"
 ```
 
-![Frequency correlation plot](images/05_frq_plot.PNG) *Frequency correlation plot of overall eGFR creatinine in the GCKD cohort, a participatin study in the CKDGenR5 consortium.*
+![Frequency correlation plot](images/05_frq_plot.PNG) *Frequency correlation plot of overall eGFR creatinine in the GCKD cohort, a study participating in the CKDGenR5 consortium.*
 
 
 
