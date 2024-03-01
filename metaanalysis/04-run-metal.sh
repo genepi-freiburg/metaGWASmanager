@@ -21,7 +21,8 @@ MA_P_DIR=${PREFIX}/metaanalysis/$Phenotype
 MA_PQUAL_DIR=${MA_P_DIR}/$QUAL
 
 
-MYFILE=${MA_PQUAL_DIR}/metal_output_$QUAL/metal-params.txt
+# MYFILE=${MA_PQUAL_DIR}/metal_output_$QUAL/metal-params.txt
+MYFILE=${MA_PQUAL_DIR}/metal-params.txt
 
 if [ ! -f $MYFILE ]
 then
