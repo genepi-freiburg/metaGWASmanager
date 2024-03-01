@@ -22,7 +22,7 @@ SKIP_EXIST="$1"
 
 
 echo "HQ_All" | tee $LOG
-mkdir HQ_All
+# mkdir HQ_All
 $SCRIPTS_MA/prepare-ma-input.sh ${MA_P_DIR}/input-files-with-path.txt 0 0.6 1 100 20 0 ${MA_P_DIR}/HQ_All/input_HQ_All $SKIP_EXIST | tee -a $LOG
 
 
