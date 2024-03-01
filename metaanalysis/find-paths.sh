@@ -21,7 +21,7 @@ do
         	        echo "NOT FOUND => directory MISSING!!"
 	fi
 
-	MYPATHdata=`find ${PREFIX}/"${FN}"/data -type f -name "*$3*.gz"`
+	MYPATHdata=`find ${PREFIX}/cleaning/"${FN}"/data -type f -name "*$3*.gz"`
         if [ "$MYPATHdata" == "" ]
         then
                         echo "NOT FOUND => FILE MISSING!!"
