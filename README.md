@@ -251,7 +251,7 @@ B) **Run GWAS using *regenie***
 SAs then will execute ***03-submit-all-jobs.sh*** to submit all GWAS according to the jobs generated in the preceding step for both *regenie*-steps 1 and 2.
 
 ```{r, eval=FALSE}
-bash 03-submit-all-jobs.sh
+bash 03-submit-all-jobs.sh parameters.txt
 ```
 
 Our recommendation is to first run a pilot analysis (e.g., one phenotype for *regenie*-step1, one chromosome for *regenie*-step2) before submitting all jobs.
