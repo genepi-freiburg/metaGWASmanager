@@ -37,7 +37,7 @@ Same as SAs, but also:
 
 - [GWASinspector](https://cran.r-project.org/web/packages/GWASinspector/index.html) R package
   - SQLite reference data available [here](http://gwasinspector.com/#download)
-
+  - The alt_headers.txt file is available in the extended data in the [CRAN Archive](https://cran.r-project.org/web/packages/GWASinspector/index.html)
 - [Perl](https://www.perl.org/)
 - [HTSlib](https://www.htslib.org/)
 - [FlexiBLAS](https://www.mpi-magdeburg.mpg.de/projects/flexiblas)
