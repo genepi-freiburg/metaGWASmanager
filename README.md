@@ -37,7 +37,7 @@ Same as SAs, but also:
 
 - [GWASinspector](https://cran.r-project.org/web/packages/GWASinspector/index.html) R package
   - SQLite reference data available [here](http://gwasinspector.com/#download)
-
+  - The alt_headers.txt file is available in the extended data in the [CRAN Archive](https://cran.r-project.org/web/packages/GWASinspector/index.html)
 - [Perl](https://www.perl.org/)
 - [HTSlib](https://www.htslib.org/)
 - [FlexiBLAS](https://www.mpi-magdeburg.mpg.de/projects/flexiblas)
@@ -137,6 +137,7 @@ The Analysis Plan PDF document should provided comprehensive information for SAs
 
 ## **Phase 2 - SA:  Prepare Phenotypes**
 In a first step, CA will ask for preparation the phenotypic data for all participating studies. CA will supply an Analysis Plan and the *pheno_generation* folder. 
+Please note, that for each study and for each ancestry analyzed, one copy of the *pheno_generation* folder should be used.
 
 Input files for each participating study include: a) the ***input.txt*** file, a database created by SA according to the CA guide standards (see the ***dummy-input.txt*** example), and b) SAs will complete the parameter file (***parameters.txt***) provided by CAs.
 

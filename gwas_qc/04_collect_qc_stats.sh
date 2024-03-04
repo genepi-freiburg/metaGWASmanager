@@ -10,7 +10,7 @@ POSCTRL=${CLEANING_DIR}/00_SUMMARY/positive-controls.csv
 POSCTRLXLSX=${CLEANING_DIR}/00_SUMMARY/positive-controls.xlsx
 rm -f $POSCTRL
 
-for STUDY in `ls -d ${PREFIX}/*`
+for STUDY in `ls -d ${PREFIX}/cleaning/*`
 do
 	FN=`basename $STUDY`
 	if [ "$FN" == "00_SUMMARY" -o "$FN" == "00_ARCHIVE" ]
@@ -31,7 +31,7 @@ do
 		PHENO=`$SCRIPTS_DIR/find-main-pheno.sh $STUDY_FILE`
 		POP=`$SCRIPTS_DIR/find-population.sh $STUDY_FILE`
 		echo " - Pheno: $PHENO, Pop: $POP"
-		Rscript ${SCRIPTS_DIR}/04-collect-qc-stats-for-file.R $STUDY_FILE $FN $PHENO $POP $OFN
+		Rscript ${SCRIPTS_DIR}/04_collect_qc_stats_for_file.R $STUDY_FILE $FN $PHENO $POP $OFN
 		RC="$?"
 		if [ "$RC" -ne 0 ]
 		then
