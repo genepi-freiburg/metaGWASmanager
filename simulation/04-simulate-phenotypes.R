@@ -31,19 +31,17 @@ nrow(geno2)
 d = merge(d, geno2)
 nrow(d)
 
-
-d$crea0 = rnorm(nrow(d), 1.0, 0.1)
-d$crea1 = rnorm(nrow(d), 1.1, 0.1)
-d$crea2 = rnorm(nrow(d), 1.2, 0.1)
+d$egfr0 = rnorm(nrow(d), 90, 20)
+d$egfr1 = rnorm(nrow(d), 80, 20)
+d$egfr2 = rnorm(nrow(d), 70, 20)
 
 summary(d)
 
-
-d$crea = ifelse(d$rs4293393_A == 0, d$crea0, ifelse(d$rs4293393_A == 1, d$crea1, d$crea2))
-d$crea = ifelse(d$crea > 0, d$crea, 0)
-d$crea0 = NULL
-d$crea1 = NULL
-d$crea2 = NULL
+d$egfr = ifelse(d$rs4293393_A == 0, d$egfr0, ifelse(d$rs4293393_A == 1, d$egfr1, d$egfr2))
+d$egfr = ifelse(d$egfr > 0, d$egfr, 0)
+d$egfr0 = NULL
+d$egfr1 = NULL
+d$egfr2 = NULL
 
 d$age = rnorm(nrow(d), 50, 5)
 d$age = ifelse(d$age > 0, d$age, 0)
