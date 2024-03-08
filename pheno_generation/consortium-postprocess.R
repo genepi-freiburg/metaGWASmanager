@@ -257,11 +257,9 @@ if (mode == "post") {
     vars.c<- c(trimws(unlist(strsplit(summary_all$Cat_covar[summary_all$Phenotypes == pheno], ","))))
     
     #All types of variables
-    if(!is.na(vars.c)){  #Do not worry about the warning if appear
-      vars<- c(vars.q, vars.c)
-    } else {
-      vars<- c(vars.q)
-    }
+    vars<- c(vars.q, vars.c)
+    vars<- vars[!is.na(vars)]
+
     names(vars)<- pheno
     
     #Apply function "summarize_all_variable" for each variable present in the "vars" vector. 
