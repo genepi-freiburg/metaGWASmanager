@@ -41,6 +41,6 @@ for eth in "${ethnicities[@]}"; do
 		--chr $CHR \
 		--keep 1000G.${eth}.final.indv \
 		--export bgen-1.2 bits='8' \
-		--out imputed/${eth}/1000G_imputed.eur.chr$CHR
+		--out imputed/${eth}/1000G_imputed.${eth}.chr$CHR
 	done
 done
