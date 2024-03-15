@@ -21,7 +21,7 @@ for (eth in ethnicities){
 	tblIn$age_plasmametal=tblIn$age
 	tblIn$smoking_plasmametal=sample(smoking, N, replace = TRUE)
 	tblIn$bmi_plasmametal=round(runif(N, min = 20, max = 40), 2)
-	tblIn$selenium_urine=tblIn$egfr
+	tblIn$selenium_urine=tblIn$simulated
 	tblIn$arsenic_urine=round(runif(N, min = 20, max = 40), 2)
 	tblIn$cadmium_plasma=round(runif(N, min = 20, max = 40), 2)
 	tblIn$selenium_plasma=round(runif(N, min = 20, max = 40), 2)
