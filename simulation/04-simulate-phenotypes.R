@@ -31,14 +31,14 @@ nrow(geno2)
 d = merge(d, geno2)
 nrow(d)
 
-d$egfr0 = rnorm(nrow(d), 90, 20)
-d$egfr1 = rnorm(nrow(d), 80, 20)
-d$egfr2 = rnorm(nrow(d), 70, 20)
+d$egfr0 = rnorm(nrow(d), 110, 20)
+d$egfr1 = rnorm(nrow(d), 60, 20)
+d$egfr2 = rnorm(nrow(d), 40, 20)
 
 summary(d)
 
-d$egfr = ifelse(d$rs4293393_A == 0, d$egfr0, ifelse(d$rs4293393_A == 1, d$egfr1, d$egfr2))
-d$egfr = ifelse(d$egfr > 0, d$egfr, 0)
+d$simulated = ifelse(d$rs4293393_A == 0, d$egfr0, ifelse(d$rs4293393_A == 1, d$egfr1, d$egfr2))
+d$simulated = ifelse(d$simulated > 0, d$simulated, 0)
 d$egfr0 = NULL
 d$egfr1 = NULL
 d$egfr2 = NULL
