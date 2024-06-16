@@ -33,7 +33,6 @@ make_assoc_jobs <- function(jobs_phenos, GWAS_tool, parameters_list, study_covar
     
     quant_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Quant_covar"], study_covar_cols)
     cat_covars <- c(jobs_phenos[jobs_phenos$Phenotypes == pheno, "Cat_covar"], study_cat_covar_cols)
-    covars<- paste(cat_covars, quant_covars, sep = ",")
     type <- jobs_phenos[jobs_phenos$Phenotypes == pheno, "Type"]
     
     run_idx = run_idx + 1
@@ -84,13 +83,22 @@ make_assoc_jobs <- function(jobs_phenos, GWAS_tool, parameters_list, study_covar
       if (GWAS_tool=="plink") {
         
         #Create folders
-        folders <- c("regenie_temp", "logs", "output_plink","jobs")
+        folders <- c("plink_temp", "logs", "output_plink","jobs")
         # Create folders
         for (folder in folders) {
           dir.create(folder, recursive = TRUE, showWarnings = FALSE)
         }
         
         #Create plink jobs
+        if(is.na(cat_covars)){
+          covars<- paste(quant_covars, sep = ",") 
+        } else {
+          covars<- paste(cat_covars, quant_covars, sep = ",")
+          cat_covars_s<-strsplit(cat_covars, ",")[[1]]
+          result[cat_covars_s] <- lapply(result[cat_covars_s], function(x) replace(x, is.na(x), "NONE"))
+          write.table(result, data_fn, 
+                      row.names = F, col.names = T, sep = "\t", quote = F)
+        }
         cat(paste0("assoc_tool/make-plink-job-scripts.sh ",
                    parameters_list$study_name, " ",
                    parameters_list$ancestry, " ",
@@ -101,11 +109,6 @@ make_assoc_jobs <- function(jobs_phenos, GWAS_tool, parameters_list, study_covar
                    covars, "' ",
                    run_idx, "\n"),
             append = T, file = script_fn)
-        
-        cat_covars_s<-strsplit(cat_covars, ",")[[1]]
-        result[cat_covars_s] <- lapply(result[cat_covars_s], function(x) replace(x, is.na(x), "NONE"))
-        write.table(result, data_fn, 
-                    row.names = F, col.names = T, sep = "\t", quote = F)
         
       }#Plink assoc tool
       
