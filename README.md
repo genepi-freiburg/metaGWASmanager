@@ -9,14 +9,14 @@ output:
 
 # **Overview**
 This vignette introduces the metaGWASmanager, a comprehensive toolbox leveraging existing software packages and, streamlining the entire GWAS-consortium workflow. This encompasses the phenotype generation, quality control of phenotypes, GWAS, GWAS-QC and meta-analysis providing an integrated solution for both the participating Study Analysts (SA) and Consortium Analysts (CA). For a description, please see the corresponding manuscript:
-Zulema Rodriguez-Hernandez, Mathias Gorski, Maria Tellez Plaza, Pascal Schlosser* and Matthias Wuttke* (2023). “metaGWASmanager: A toolbox for an automated workflow from phenotypes to meta-analysis in GWAS consortia”. Under review.
+Zulema Rodriguez-Hernandez, Mathias Gorski, Maria Tellez Plaza, Pascal Schlosser* and Matthias Wuttke* (2023). “metaGWASmanager: A toolbox for an automated workflow from phenotypes to meta-analysis in GWAS consortia”. *Bioinformatics*,2024. 10.1093/bioinformatics/btae294.
 
 ![Workflow](images/F1_2024-03-12.png) *Illustration of the metaGWASmanager pipeline, outlining phenotype generation and quality assurance, followed by the GWAS, GWAS-QC and meta-analysis steps, along with the required inputs and resulting outputs. Shaded and white sections indicate tasks to be carried out by CA and SA, respectively.*
 
 ---
 
 # **Installation**
-To set up the toolbox please fork the github repository:
+To set up the toolbox please fork the GitHub repository:
 https://github.com/genepi-freiburg/gwas-consortium/tree/main
 
 ---
@@ -131,22 +131,22 @@ Please, note that, regarding the type of association tool to use, currently meta
 
 
 B) **Parameters file**. 
-CA will customize the ***parameters.txt*** file based on the particular traits to study. It must included important points, which must be filled out by the SAs, such as the name of the input file and the participant-study, SAs contact information, the study's ancestral background, analysis date, units of the variables to be studied, laboratory particular settings (e.g., limits of detection), imputation reference panel, number of genetic principal components, and some more optional fields. A parameters file example is provided within the *pheno_generation* folder on the metaGWASmanager GitHub repository.
+CA will customize the ***parameters.txt*** file based on the particular traits to study. It must included important points, which must be filled out by the SAs, such as the name of the input file and the participant-study, SAs' contact information, the study's ancestral background, analysis date, units of the variables to be studied, laboratory particular settings (e.g., limits of detection), imputation reference panel, number of genetic principal components, and some more optional fields. A parameters file example is provided within the *pheno_generation* folder on the metaGWASmanager GitHub repository.
 
 C) **Analysis Plan**.
-The Analysis Plan (e.g., PDF document) should provided comprehensive information for SAs on how to proceed with the different analyses, including **Phase 2 - SA:  Prepare Phenotypes** and **Phase 4 - SA: Perform Associations Analysis**. Certainly, you are welcome to use the information described in this documentation. It is also essential to include CAs contact details in case any questions arise.
+The Analysis Plan (e.g., PDF document) should provided comprehensive information for SAs on how to proceed with the different analyses, including **Phase 2 - SA:  Prepare Phenotypes** and **Phase 4 - SA: Perform Associations Analysis**. Certainly, you are welcome to use the information described in this documentation. It is also essential to include CAs' contact details in case any questions arise.
 
 
 ## **Phase 2 - SA:  Prepare Phenotypes**
 In a first step, CA will ask for preparation the phenotypic data for all participating studies. CA will supply an Analysis Plan and the *pheno_generation* folder. 
-Please note, that for each study and for each ancestry analyzed, one copy of the *pheno_generation* folder should be used.
+Please note, that for each study and for each ancestry, one copy of the *pheno_generation* folder should be used.
 
 Input files for each participating study include: a) the ***input.txt*** file, a database created by SA according to the CA guide standards (see the ***dummy-input.txt*** example), and b) SAs will complete the parameter file (***parameters.txt***) provided by CAs.
 
-After that, SAs will execute the ***01-phenotypes-generation.sh*** script, which automatically generates the descriptive statistics of phenotypes, on a Linux server as follows:
+After that, SAs will execute the ***01-phenotype-generation.sh*** script, which automatically generates the descriptive statistics of phenotypes, on a Linux server as follows:
 
 ```{r, eval=FALSE}
-bash 01-phenotypes-generation.sh parameters.txt
+bash 01-phenotype-generation.sh parameters.txt
 ```
 
 
@@ -186,7 +186,7 @@ Both scripts summarize phenotype summary-statistics submissions (***STUDY_NAME_i
 ```
 
 
-Note that the generated outputs of the inter-study comparison analyses will be automatically saved in the *00_SUMMARY* folder located at:
+The generated outputs of the inter-study comparison analyses will be automatically saved in the *00_SUMMARY* folder located at:
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/uploads/pheno/00_SUMMARY"
@@ -196,7 +196,7 @@ After the inspection of the submitted files, CA will provide feedback to SAs. In
 
 
 ## **Phase 4 - SA: Perform Associations Analysis**
-To initiate this step, SAs should have received the approval from CA and they must have prepared the genetic information.
+To initiate this step, SAs should have received the approval from CA. First SAs prepared the genetic information according to the CAs guidelines.
 
 For both association tools (*PLINK 2.0* and *regenie*, specially for *regenie*-step2) imputed genetic data (chunked by chromosome) in *.bgen* format v1.2 with 8 bits encoding is required. SAs can easily convert the imputed data to *.bgen* format using the provided ***vcf_to_bgen.sh*** script, inside the *pheno_generation* folder or by running the following commands on Linux:
 
@@ -265,7 +265,7 @@ bash 02-consortium-make-assoc-jobs.sh parameters.txt
 
 The process will generate the different jobs (saved in the *jobs* folder), which include the phenotypes and covariates to be used along with the command lines necessary to run the association analyses.
 
-For instance, for *regenie*-step1, as many jobs as phenotype will be created, while  one job for each phenotype and chromosome for *regenie*-step2 and *PLINK 2.0*.
+For instance, for *regenie*-step1, as many jobs as phenotype will be created, versus  one job for each phenotype and chromosome for *regenie*-step2 and *PLINK 2.0*.
 
 
 B) **Run GWAS**
@@ -298,9 +298,9 @@ Finally, the results will be compiled into a compressed folder using ***05-colle
 bash 05-collect-files-for-upload.sh study_name
 ```
 
-It will be created a a gzipped tar-ball folder containing outputs from *return_pheno* folder including log files, summary tables and plots, and the association-output folders (*regenie-step2* or *output_plink* folder). The compressed folder will then be submitted to the CA server for further validation.
+A gzipped tar-ball folder will be created, containing outputs from *return_pheno* folder including log files, summary tables and plots, and the association-output folders (*regenie-step2* or *output_plink* folder). The compressed folder will then be submitted to the CA server for further validation.
 
-We also recommend that CAs, at this point, somehow collect information about the specific authors (names, affiliations, conflict of interest, etc) and studies (genotyping information, study acknowledgements, other relevant study information). For example, CAs may use a Google Sheets and/or Google Forms.
+We also recommend that CAs, at this point, somehow collect information about the specific authors (names, affiliations, conflict of interest, etc.) and studies (genotyping information, study acknowledgements, other relevant study information). For example, CAs may use a Google Sheets and/or Google Forms.
 
 
 ## **Phase 5 - CA: Check Associations & Meta-analysis**
@@ -319,14 +319,14 @@ CA will then proceed to unzip the folder and run scripts located in the *gwas_qc
 
 
 #### ***folders.config.sh*** file
-It includes details about essential pathways (script folder, cleaning directory, upload data, etc) and specific variables (phenotypes, ancestry and strata vectors, among others) needed for executing downstream scripts. CAs first should customize these fields and may also incorporate important settings to align with particular server requirements. The ***folders.config.sh*** file will be sourced throughout subsequent scripts, so no modification to other scripts are needed.
+It includes details about essential pathways (script folder, cleaning directory, upload data, etc.) and specific variables (phenotypes, ancestry and strata vectors, among others) needed for executing downstream scripts. CAs first should customize these fields and may also incorporate important settings to align with particular server requirements. The ***folders.config.sh*** file will be sourced throughout subsequent scripts, so no modification to other scripts are needed.
 
 After making the necessary settings to the *folders.config.sh* file, CA are ready to carry out the subsequent steps.
 
 
 A) ***01_combine_chromosomes.sh***.
 
-It checks if any files are  missing from the association-output folder ensuring the presence of the required columns using the **find-column-index.pl** script. Subsequently, it merges all the chromosomes into a single compressed file for each trait and the corresponding tabix files are generated.
+It checks if any file is  missing from the association-output folder ensuring the presence of the required columns using the **find-column-index.pl** script. Subsequently, it merges all the chromosomes into a single compressed file for each trait and the corresponding tabix files are generated.
 
 
 Command line to run:
@@ -345,7 +345,7 @@ CAs will then run GWASinspector:
 bash 02_gwasinspector.sh study_name
 ```
 
-GWASinspector performs an extensive quality control process on GWAS results ensuring their accuracy, proper format, and consistency across all studies using robust criteria. As a result, in the *cleaning/study_name/qc_output* folder, clean and harmonized files will be created along with a comprehensive report and plots (including Manhattan, QQ plots, histograms, etc) as shown below:
+GWASinspector performs an extensive quality control process on GWAS results ensuring their accuracy, proper format, and consistency across all studies using robust criteria. As a result, in the *cleaning/study_name/qc_output* folder, clean and harmonized files will be created along with a comprehensive report and plots (including Manhattan, QQ plots, histograms, etc.) as shown below:
 
 
 ![GWASinspector output. Manhattan plots](images/03_GWASinspector_ManhattanQC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_M.png) *Manhattan plot created by GWASinpector workflow of overall eGFR creatinine in the GCKD cohort, a participating study in the CKDGenR5 consortium.*
@@ -484,9 +484,9 @@ bash 08_checkAllFileNames.sh
 
 I) ***09_GWAS_QC_multistudies.sh***
 
-By combining the summary statistics from GWAS QC (***qc-stats.csv***) and the results of positive controls analysis (***positive-controls.csv***) across all participating studies, CA will perform a final checking process. A set of relevant items will be checked, including:  wrong genomic build, allele switches and swaps, missing data, file and number formatting issues, unaccounted inflation, and wrong transformations, among others.
+By combining the summary statistics from GWAS-QC (***qc-stats.csv***) and the results of positive controls analysis (***positive-controls.csv***) across all participating studies, CA will perform a final checking process. A set of relevant items will be checked, including:  wrong genomic build, allele switches and swaps, missing data, file and number formatting issues, unaccounted inflation, and wrong transformations, among others.
 
-metaGWASmanager provides a script (***09_GWAS_QC_multistudies.sh***), which automatically evaluates the list of potential problems mentioned above. For its execution, CA will require the previously edited ***consortium-specifics.R*** plug-in, located in the *pheno_generation* folder. It supplies a tolerance table establishing the thresholds to apply at each verification stage based on the different phenotypes and covariates to be tested. 
+MetaGWASmanager provides a script (***09_GWAS_QC_multistudies.sh***), which automatically evaluates the list of potential problems mentioned above. For its execution, CA will require the previously edited ***consortium-specifics.R*** plug-in, located in the *pheno_generation* folder. It supplies a tolerance table establishing the thresholds to apply at each verification stage based on the different phenotypes and covariates to be tested. 
 
 Command line to run:
 
@@ -526,14 +526,14 @@ First, CAs must prepare the ***input-file-list.txt*** containing all the study n
 | ...                    |
 | Study_name_N           |
 
-The file should be save within the created *metaanalysis* directory.
+The file should be saved within the created *metaanalysis* directory.
 
 
 ```{r, eval=FALSE}
 "/storage/consortium_name/metaanalysis"
 ```
 
-Given a phenotype (e.g., uacr_int) the ***01-locate-input-files.sh*** script creates the ***input-files-with-path.txt*** file with the full paths to the cleaned association-output files for the specific phenotype across all studies intended for meta-analysis.
+Given a phenotype (e.g., uacr_int), the ***01-locate-input-files.sh*** script creates the ***input-files-with-path.txt*** file. It contains  the full paths to the cleaned association-output files across all studies intended for meta-analysis.
 
 ```{r, eval=FALSE}
 bash 01-locate-input-files.sh uacr_int
@@ -558,7 +558,7 @@ bash 02-prepare-ma-input.HQ.sh uacr_int
 
 L) ***03-prepare-metal-params.sh***
 
-The  ***03-prepare-metal-params.sh*** script uses the ***metal-params.txt*** template, which contains different filters (MAF, MAC, genomic control [yes, or not], etc) to be set by   CAs according to their preferences. The selected options are then used by the METAL software for conducting pior meta-analysis steps (e.g., genomic control correction) and meta-analysis.
+The  ***03-prepare-metal-params.sh*** script uses the ***metal-params.txt*** template, which contains different filters (MAF, MAC, genomic control [yes, or not], etc.) to be set by   CAs according to their preferences. The selected options are then used by the METAL software for conducting pior meta-analysis steps (e.g., genomic control correction) and meta-analysis.
 
 
 To run the script, the phenotype (e.g., uacr_int) and type of selected variants (e.g, LQ or HQ) must be provided as arguments:
