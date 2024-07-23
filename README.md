@@ -9,7 +9,7 @@ output:
 
 # **Overview**
 This vignette introduces the metaGWASmanager, a comprehensive toolbox leveraging existing software packages and, streamlining the entire GWAS-consortium workflow. This encompasses the phenotype generation, quality control of phenotypes, GWAS, GWAS-QC and meta-analysis providing an integrated solution for both the participating Study Analysts (SA) and Consortium Analysts (CA). For a description, please see the corresponding manuscript:
-Zulema Rodriguez-Hernandez, Mathias Gorski, Maria Tellez Plaza, Pascal Schlosser* and Matthias Wuttke* (2023). “metaGWASmanager: A toolbox for an automated workflow from phenotypes to meta-analysis in GWAS consortia”. *Bioinformatics*,2024. 10.1093/bioinformatics/btae294.
+Zulema Rodriguez-Hernandez, Mathias Gorski, Maria Tellez Plaza, Pascal Schlosser* and Matthias Wuttke* (2024). “metaGWASmanager: A toolbox for an automated workflow from phenotypes to meta-analysis in GWAS consortia”. *Bioinformatics*,2024. 10.1093/bioinformatics/btae294.
 
 ![Workflow](images/F1_2024-03-12.png) *Illustration of the metaGWASmanager pipeline, outlining phenotype generation and quality assurance, followed by the GWAS, GWAS-QC and meta-analysis steps, along with the required inputs and resulting outputs. Shaded and white sections indicate tasks to be carried out by CA and SA, respectively.*
 
@@ -37,7 +37,7 @@ Same as SAs, but also:
 
 - [GWASinspector](https://cran.r-project.org/web/packages/GWASinspector/index.html) R package
   - SQLite reference data available [here](http://gwasinspector.com/#download)
-  - The alt_headers.txt file is available in the extended data in the [CRAN Archive](https://cran.r-project.org/web/packages/GWASinspector/index.html)
+  - The *alt_headers.txt* file is available in the extended data in the [CRAN Archive](https://cran.r-project.org/web/packages/GWASinspector/index.html)
 - [Perl](https://www.perl.org/)
 - [HTSlib](https://www.htslib.org/)
 - [FlexiBLAS](https://www.mpi-magdeburg.mpg.de/projects/flexiblas)
@@ -83,7 +83,7 @@ The GWAS results (output of **Phase 4 - SA: Perform Associations Analysis**) sub
 "/storage/consortium_name/uploads/assoc/study_name"
 ```
 
-Similar to the *uploads/pheno* directory, it is recommended to create a *00_ARCHIVE* sub-directory.
+Similar to the *uploads/pheno* directory, we recommend to create a *00_ARCHIVE* sub-directory.
 
 It is advised to maintain consistency in the naming of studies within both the *uploads/pheno* and *uploads/assoc* folders to prevent potential problems when cross-referencing files between the two folders.
 
@@ -98,7 +98,7 @@ Contains intermediate files, logs and summary files resulting from **Phase 5 - C
 In addition to the folders designated for each study, it should also encompass two extra directories:
 
 - *00_ARCHIVE*.  To save older results.
-- *00_SUMMARY*. It will contain the output of cross-study GWAS verification  process (**Phase 5 - CA: Check Associations & Meta-analysis**) including plots, overall statistical summaries, positive controls validation result, among others.
+- *00_SUMMARY*. It will contain the output of cross-study GWAS verification  process (**Phase 5 - CA: Check Associations & Meta-analysis**) including plots, overall statistical summaries, positive control validation results, among others.
 
 
 Note that the sub-folder "*data*" within each study folder contains the GWAS results combined by chromosomes.
@@ -124,7 +124,7 @@ The initial stage involves generating Consortium-specific files (*consortium-spe
 
 
 A) ***consortium-specifics.R***. 
-The *consortium-specifics.R* plug-in file (located in the *pheno_generation* folder) should be edited according to the CA specifications. This file contains several functions that allow customization of the entire analysis process: verification of the *input* and *parameteres* files; unit conversion; traits transformations (rank-based inverse normalization and log-transformation are implemented); setting quality control parameters, covariates and stratification-variables; association tool to be used (e.g., *PLINK 2.0*, *regenie*, etc), among others. These functions will be applied in subsequent stages of the workflow process. 
+The *consortium-specifics.R* plug-in file (located in the *pheno_generation* folder) should be edited according to the CA specifications. This file contains several functions that allow customization of the entire analysis process: verification of the *input* and *parameteres* files; unit conversion; traits transformations (rank-based inverse normalization and log-transformation are implemented); setting quality control parameters, covariates and stratification-variables; association tool to be used (e.g., *PLINK 2.0*, *regenie*, etc.), among others. These functions will be applied in subsequent stages of the workflow process. 
 The ***consortium-specifics.R*** file will be provided to each SAs along the Analysis Plan and required scripts.
 
 Please, note that, regarding the type of association tool to use, currently metaGWASmanager has implemented *PLINK 2.0* and *regenie* softwares. CAs can choose one of these two. However, in case CAs prefer to use another different one, we provide a plug-in interface, ***assoc_tool_plugin.R***, within the *pheno_generation/assoc_tool* folder, that CAs can customize  to add a different association tool.   
@@ -150,7 +150,7 @@ bash 01-phenotype-generation.sh parameters.txt
 ```
 
 
-Note that if SAs prepare their data in a Windows or Mac system, to avoid problems with line breaks when running the script in Linux/Unix, they should use the following commands, respectively, to convert the files prior to running the script:
+Note that if SAs prepare their data in a Windows or Mac system, to avoid problems with line breaks when running the scripts in Linux/Unix, they should use the following commands, respectively, to convert the files prior to running the scripts:
 
 ```{r, eval=FALSE}
 dos2unix input.txt
@@ -222,10 +222,10 @@ Once the genetic data is prepared, the SAs can systematically initiate the neces
 
 A) **Create job files**.
 
-First, SAs should adjust the *make-association-job-scripts* within the *pheno_generation/assoc_tool* folder according to their requirements (data path and genotype file prefix, etc).
+First, SAs should adjust the *make-association-job-scripts* within the *pheno_generation/assoc_tool* folder according to their requirements (data path and genotype file prefix, etc.).
 
 
-A.1) **For regenie:**.
+A.1) **For regenie:**
 
 Two files to be modified by SAs: ***make-regenie-step1-job-scripts.sh*** and ***make-regenie-step2-job-scripts.sh***:
 
@@ -244,7 +244,7 @@ For ***make-regenie-step2-job-scripts.sh***:
     . --threads <Number of threads that should be utilized by each individual regenie-step-2 job>
 
 
-A.2) **For PLINK 2.0:**.
+A.2) **For PLINK 2.0:**
 
 One file to be edited by SAs: **make-plink-job-scripts.sh**:
 
@@ -257,7 +257,7 @@ One file to be edited by SAs: **make-plink-job-scripts.sh**:
 
 Note that these scripts are set up to utilize a Slurm job scheduler.
 
-Upon making the mentioned adjustments, SAs can executed the ***02-consortium-make-assoc-jobs.sh*** script.
+Upon making the mentioned adjustments, SAs can execute the ***02-consortium-make-assoc-jobs.sh*** script.
 
 ```{r, eval=FALSE}
 bash 02-consortium-make-assoc-jobs.sh parameters.txt
@@ -281,7 +281,7 @@ Our recommendation is to first run a pilot analysis before submitting all jobs. 
 
 C) **Create Summary Statistics** and **Collect & Upload results**.
 
-The SAs will then run the ***04-postprocess-results.sh*** script, which investigate the different log files generated during the association process to ensure the successful execution of each GWAS. It also produces tailored summary tables for each association analysis. 
+The SAs will then run the ***04-postprocess-results.sh*** script, which investigates the different log files generated during the association process to ensure the successful execution of each GWAS. It also produces tailored summary tables for each association analysis. 
 
 
 ```{r, eval=FALSE}
@@ -348,10 +348,10 @@ bash 02_gwasinspector.sh study_name
 GWASinspector performs an extensive quality control process on GWAS results ensuring their accuracy, proper format, and consistency across all studies using robust criteria. As a result, in the *cleaning/study_name/qc_output* folder, clean and harmonized files will be created along with a comprehensive report and plots (including Manhattan, QQ plots, histograms, etc.) as shown below:
 
 
-![GWASinspector output. Manhattan plots](images/03_GWASinspector_ManhattanQC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_M.png) *Manhattan plot created by GWASinpector workflow of overall eGFR creatinine in the GCKD cohort, a participating study in the CKDGenR5 consortium.*
+![GWASinspector output. Manhattan plots](images/03_GWASinspector_ManhattanQC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_M.png) *Manhattan plot created by GWASinspector workflow of overall eGFR creatinine in the GCKD cohort, a participating study in the CKDGenR5 consortium.*
 
 
-![GWASinspector output. QC-plots](images/04_GWASInspector_QC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_histogram.png) *Quality controls plot created by GWASinpector workflow of overall eGFR creatinine in the GCKD cohort, a participating study in the CKDGenR5 consortium.*
+![GWASinspector output. QC-plots](images/04_GWASInspector_QC_gckd_EUR_TopMed_20221004_quantitative_overall_4_egfr_creat_int.gwas_graph_histogram.png) *Quality controls plot created by GWASinspector workflow of overall eGFR creatinine in the GCKD cohort, a participating study in the CKDGenR5 consortium.*
 
 
 More information about GWASinspector R package [here](https://cran.r-project.org/web/packages/GWASinspector/index.html).
@@ -558,7 +558,7 @@ bash 02-prepare-ma-input.HQ.sh uacr_int
 
 L) ***03-prepare-metal-params.sh***
 
-The  ***03-prepare-metal-params.sh*** script uses the ***metal-params.txt*** template, which contains different filters (MAF, MAC, genomic control [yes, or not], etc.) to be set by   CAs according to their preferences. The selected options are then used by the METAL software for conducting pior meta-analysis steps (e.g., genomic control correction) and meta-analysis.
+The  ***03-prepare-metal-params.sh*** script uses the ***metal-params.txt*** template, which contains different filters (MAF, MAC, genomic control [yes, or not], etc.) to be set by CAs according to their preferences. The selected options are then used by the METAL software for conducting pior meta-analysis steps (e.g., genomic control correction) and meta-analysis.
 
 
 To run the script, the phenotype (e.g., uacr_int) and type of selected variants (e.g, LQ or HQ) must be provided as arguments:
