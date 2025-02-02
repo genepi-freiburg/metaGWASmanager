@@ -42,6 +42,7 @@ Same as SAs, but also:
 - [HTSlib](https://www.htslib.org/)
 - [FlexiBLAS](https://www.mpi-magdeburg.mpg.de/projects/flexiblas)
 - [Python](https://www.python.org/)
+- 1000GP frequency file. The scripts to generate the file are available in the metaGWASmanager/gwas_qc/Frequency_Comparison/1kgp_frequencies_b38_scripts folder
 
 ### Server structure
 We outline the recommended structure for the consortium server to ensure effective and efficient data management:
