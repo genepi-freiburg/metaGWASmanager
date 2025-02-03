@@ -34,7 +34,7 @@ cadmium_urine_unit 1
 # 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
 selenium_urine_unit 0
 
-# Unit of urine arsenium
+# Unit of urine arsenic
 # 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
 arsenic_urine_unit 0
 
@@ -46,7 +46,7 @@ cadmium_plasma_unit 0
 # 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
 selenium_plasma_unit 0
 
-# Unit of plasma arsenium
+# Unit of plasma arsenic
 # 0 = ug/l; 1 =ug/dl;  -1 = "not provided unit"
 arsenic_plasma_unit 0
 
@@ -58,8 +58,8 @@ cadmium_urine_lod 2.89
 # give -1 if you do not have urine selenium
 selenium_urine_lod 2.89
 
-# LOD of urine arsenium 
-# give -1 if you do not have urine arsenium 
+# LOD of urine arsenic 
+# give -1 if you do not have urine arsenic 
 arsenic_urine_lod 2.89
 
 # LOD of plasma cadmium
@@ -70,8 +70,8 @@ cadmium_plasma_lod 2.89
 # give -1 if you do not have plasma selenium
 selenium_plasma_lod 2.89
 
-# LOD of plasma arsenium
-# give -1 if you do not have plasma arsenium
+# LOD of plasma arsenic
+# give -1 if you do not have plasma arsenic
 arsenic_plasma_lod 2.89
 
 # Are urine metals available?
